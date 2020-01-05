@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ OpenSSLToolbox   the PHP OpenSSL Toolbox
+
+ This file is a part of OpenSSLToolbox.
+
+ Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ author    Kjell-Inge Gustafsson, kigkonsult
+ Link      https://kigkonsult.se
+ Version   0.971
+ License   Subject matter of licence is the software OpenSSLToolbox.
+           The above copyright, link, package and version notices,
+           this licence notice shall be included in all copies or substantial
+           portions of the OpenSSLToolbox.
+
+           OpenSSLToolbox is free software: you can redistribute it and/or modify
+           it under the terms of the GNU Lesser General Public License as published
+           by the Free Software Foundation, either version 3 of the License,
+           or (at your option) any later version.
+
+           OpenSSLToolbox is distributed in the hope that it will be useful,
+           but WITHOUT ANY WARRANTY; without even the implied warranty of
+           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+           GNU Lesser General Public License for more details.
+
+           You should have received a copy of the GNU Lesser General Public License
+           along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+-->
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         syntaxCheck="false"
+         bootstrap="autoload.php"
+        >
+    <testsuites>
+        <testsuite name="all in one">
+            <directory>test</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist='true'> <!--  processUncoveredFilesFromWhitelist="true" -->
+            <file>src/Assert.php</file>
+            <file>src/BaseFactory.php</file>
+            <file>src/Convert.php</file>
+            <file>src/HashFactory.php</file>
+            <file>src/HmacHashFactory.php</file>
+            <file>src/OpenSSLInterface.php</file>
+            <file>src/OpenSSLBaseFactory.php</file>
+            <file>src/OpenSSLBaseFactory2.php</file>
+            <file>src/OpenSSLCryptor.php</file>
+            <file>src/OpenSSLCsrFactory.php</file>
+            <file>src/OpenSSLFactory.php</file>
+            <file>src/OpenSSLPkcs7Factory.php</file>
+            <file>src/OpenSSLPkcs12Factory.php</file>
+            <file>src/OpenSSLPkeyFactory.php</file>
+            <file>src/OpenSSLSpkiFactory.php</file>
+            <file>src/OpenSSLX509Factory.php</file>
+            <file>src/PhpErrorException.php</file>
+            <file>src/Workshop.php</file>
+        </whitelist>
+    </filter>
+  <logging>
+      <!-- Remove or comment after your own choice-->
+      <!-- All logs will be saved in 'testDocs' folder -->
+      <log type="coverage-html"
+           target="testDocs/PHPUnitCoverage"
+           lowUpperBound="35"
+           highLowerBound="70"/>
+      <!-- log type="coverage-clover"
+           target="testDocs/coverage.xml"/ -->
+      <!-- log type="coverage-php"
+           target="testDocs/coverage.serialized"/ -->
+      <log type="coverage-text"
+           target="testDocs/PHPUnitReport.txt"
+           showUncoveredFiles="true"/>
+      <!-- log type="json"
+           target="testDocs/logfile.json"/ -->
+      <!-- log type="tap"
+           target="testDocs/logfile.tap"/ -->
+      <!-- log type="junit"
+           target="testDocs/logfile.xml"
+           logIncompleteSkipped="false"/ -->
+      <!-- log type="testdox-html"
+           target="testDocs/testdox.html"/ -->
+      <!-- log type="testdox-text"
+           target="testDocs/testdox.txt"/ -->
+  </logging>
+    <php>
+        <!-- if LOG set, will (debug-)log to dir "testDocs"\logs, named 'testClassname'.log -->
+        <const name="LOG" value="testDocs"/>
+    </php>
+</phpunit>

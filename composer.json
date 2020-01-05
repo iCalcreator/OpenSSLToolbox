@@ -1,0 +1,52 @@
+{
+    "name": "kigkonsult/openssltoolbox",
+    "description": "the PHP OpenSSL Toolbox",
+    "keywords": [
+        "OpenSSL",
+        "Digital",
+        "Signature",
+        "sdk",
+        "toolbox",
+        "algorithm",
+        "digest",
+        "cipher",
+        "x509",
+        "private",
+        "public",
+        "cert",
+        "encrypt",
+        "decrypt",
+        "hash",
+        "hmac",
+        "hex",
+        "base64"
+    ],
+    "time" : "2020-01-05",
+    "minimum-stability": "stable",
+    "license": "lgpl-3.0",
+    "homepage": "https://kigkonsult.se",
+    "support": {
+        "issues": "https://github.com/iCalcreator/dsigsdk/issues"
+    },
+    "authors": [
+        {
+            "name": "Kjell-Inge Gustafsson",
+            "email": "ical@kigkonsult.se"
+        }
+    ],
+    "autoload": {
+        "files": ["autoload.php"],
+        "psr-4": { "Kigkonsult\\OpenSSLToolbox\\": ["src/"] }
+    },
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "ext-openssl": "*",
+        "kigkonsult/loggerdepot": "dev-master",
+        "psr/log": "1.1.0"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "^v1.8.0",
+        "katzgrau/klogger": "1.2.1",
+        "phpunit/phpunit": "6.5.14"
+    }
+}
