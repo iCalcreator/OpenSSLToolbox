@@ -25,15 +25,21 @@
     "minimum-stability": "stable",
     "license": "lgpl-3.0",
     "homepage": "https://kigkonsult.se",
-    "support": {
-        "issues": "https://github.com/iCalcreator/dsigsdk/issues"
-    },
     "authors": [
         {
             "name": "Kjell-Inge Gustafsson",
             "email": "ical@kigkonsult.se"
         }
     ],
+    "funding": [
+        {
+            "type": "other",
+            "url": "https://paypal.me/kigkonsult"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/iCalcreator/openssltoolbox/issues"
+    },
     "autoload": {
         "files": ["autoload.php"],
         "psr-4": { "Kigkonsult\\OpenSSLToolbox\\": ["src/"] }
