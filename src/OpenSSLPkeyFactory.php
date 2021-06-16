@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -70,7 +68,6 @@ use function set_error_handler;
  */
 class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
 {
-
     /**
      * constant
      */
@@ -78,7 +75,6 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
 
     /**
      * @var resource
-     * @access private
      */
     private $pkeyResource = null;
 
@@ -87,11 +83,12 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *
      * If argument configArgs is set, a new CSR (Certificate Signing Request) is set
      *
-     * @param array $configArgs           Note, see assertConfig() for valid algos
+     * @param null|array $configArgs           Note, see assertConfig() for valid algos
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function __construct( $configArgs = null ) {
+    public function __construct( $configArgs = null )
+    {
         $this->logger = LoggerDepot::getLogger( get_class());
         $this->log(LogLevel::INFO, self::initClassStr());
         if( ! empty( $configArgs )) {
@@ -103,12 +100,12 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /**
      * Class factory method
      *
-     * @param array $configArgs          Note, see assertConfig() for valid algos
+     * @param null|array $configArgs          Note, see assertConfig() for valid algos
      * @throws InvalidArgumentException
      * @return static
-     * @access static
      */
-    public static function factory( $configArgs = null ) {
+    public static function factory( $configArgs = null ) : self
+    {
         return new self( $configArgs );
     }
 
@@ -116,12 +113,14 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * Generates a new pKewy resource - uses openssl_pkey_new
      *
      * @link https://www.php.net/manual/en/function.openssl-pkey-new.php
-     * @param array  $configArgs    If null, uses 'instance create'-configArgs, if set, otherwise from file 'openssl.cnf'
+     * @param null|array $configArgs  If null, uses 'instance create'-configArgs,
+     *                                 if set, otherwise from file 'openssl.cnf'
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function pKeyNew( $configArgs = null ) {
+    public function pKeyNew( $configArgs = null ) : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         $configArgs = $this->getConfig( $configArgs );
         $result     = false;
@@ -131,13 +130,22 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
             $result = openssl_pkey_new( $configArgs );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $this->setPkeyResource( $result );
         $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
@@ -147,12 +155,13 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /**
      * Return array( privateKey, publicKey ) with keys as resources - joins export/getPrivate + getDetails + getPublic
      *
-     * @param string $passPhrase
+     * @param null|string $passPhrase
      * @return array
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPrivatePublicKeyPairAsResources( $passPhrase = null ) {
+    public function getPrivatePublicKeyPairAsResources( $passPhrase = null ) : array
+    {
         return [
             $this->getPrivateKeyAsResource( $passPhrase ),
             self::getPublic( $this->getDetails()[self::KEY] )
@@ -162,14 +171,18 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /**
      * Return array( privateKey, publicKey ) with keys as PEM strings - joins export + getDetails
      *
-     * @param string $passPhrase   opt private key passphrase
-     * @param array  configArgs    opt private key config
-     *                             If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase   opt private key passphrase
+     * @param null|array  $configArgs   opt private key config
+     *                                   If null, uses 'instance create'-configArgs, if set
      * @return array
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPrivatePublicKeyPairAsPemStrings( $passPhrase = null, $configArgs = null ) {
+    public function getPrivatePublicKeyPairAsPemStrings(
+        $passPhrase = null,
+        $configArgs = null
+    ) : array
+    {
         return [
             $this->export( $passPhrase, $configArgs ),
             $this->getDetails()[self::KEY]
@@ -179,14 +192,18 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /**
      * Return array( privateKey, publicKey ) with keys as DER strings - extends export + getDetails
      *
-     * @param string $passPhrase   opt private key passphrase
-     * @param array  configArgs    opt private key config
-     *                             If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase   opt private key passphrase
+     * @param null|array  $configArgs   opt private key config
+     *                                   If null, uses 'instance create'-configArgs, if set
      * @return array
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPrivatePublicKeyPairAsDerStrings( $passPhrase = null, $configArgs = null ) {
+    public function getPrivatePublicKeyPairAsDerStrings(
+        $passPhrase = null,
+        $configArgs = null
+    ) : array
+    {
         return [
             $this->getPrivateKeyAsPemString( $passPhrase, $configArgs ),
             $this->getPublicKeyAsDerString()
@@ -198,13 +215,19 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *
      * @param string $privateFile  Path to the output private key file.
      * @param string $publicFile  Path to the output public key file.
-     * @param string $passPhrase
-     * @param array  configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs   If null, uses 'instance create'-configArgs, if set
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function savePrivatePublicKeyPairIntoPemFiles( $privateFile, $publicFile, $passPhrase = null, $configArgs = null ) {
+    public function savePrivatePublicKeyPairIntoPemFiles(
+        string $privateFile,
+        string $publicFile,
+        $passPhrase = null,
+        $configArgs = null
+    ) : self
+    {
         $this->exportToFile( $privateFile, $passPhrase, $configArgs );
         $this->savePublicKeyIntoPemFile( $publicFile );
         return $this;
@@ -213,17 +236,21 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /**
      * Saves privateKey and publicKey into DER files - extends exportToFile + getDetails
      *
-     * @param string $privateFile  Path to the output private key file.
-     * @param string $publicFile  Path to the output public key file.
-     * @param string $passPhrase
-     * @param array  configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param string $privateFile      Path to the output private key file.
+     * @param string $publicFile       Path to the output public key file.
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs  If null, uses 'instance create'-configArgs, if set
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
     public function savePrivatePublicKeyPairIntoDerFiles(
-        $privateFile, $publicFile, $passPhrase = null, $configArgs = null
-    ) {
+        string $privateFile,
+        string $publicFile,
+        $passPhrase = null,
+        $configArgs = null
+    ) : self
+    {
         $this->savePrivateKeyIntoDerFile($privateFile, $passPhrase, $configArgs  );
         $this->savePublicKeyIntoDerFile( $publicFile );
         return $this;
@@ -233,13 +260,14 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * Return an exportable string representation of a private key - uses openssl_pkey_export
      *
      * @link https://www.php.net/manual/en/function.openssl-pkey-export.php
-     * @param string $passPhrase
-     * @param array  $configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs    If null, uses 'instance create'-configArgs, if set
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function export( $passPhrase = null, $configArgs = null ) {
+    public function export( $passPhrase = null, $configArgs = null ) : string
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isPkeyResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -251,16 +279,30 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_pkey_export( $this->pkeyResource, $output, $passPhrase, $configArgs );
+            $result = openssl_pkey_export(
+                $this->pkeyResource,
+                $output,
+                $passPhrase,
+                $configArgs
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $output;
@@ -269,26 +311,34 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /**
      * Return string PEM representation of a private key - alias of export
      *
-     * @param string $passPhrase
-     * @param array  configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs   If null, uses 'instance create'-configArgs, if set
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPrivateKeyAsPemString( $passPhrase = null, $configArgs = null ) {
+    public function getPrivateKeyAsPemString(
+        $passPhrase = null,
+        $configArgs = null
+    ) : string
+    {
         return $this->export( $passPhrase, $configArgs );
     }
 
     /**
      * Return string DER representation of a private key - extends export
      *
-     * @param string $passPhrase
-     * @param array  configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs   If null, uses 'instance create'-configArgs, if set
      * @return string  DER format
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPrivateKeyAsDerString( $passPhrase = null, $configArgs = null ) {
+    public function getPrivateKeyAsDerString(
+        $passPhrase = null,
+        $configArgs = null
+    ) : string
+    {
         return self::pem2Der( $this->export( $passPhrase, $configArgs ));
     }
 
@@ -296,12 +346,13 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * Return private key as resource - join of export/getPrivate
      *
      * @link https://www.php.net/manual/en/function.openssl-pkey-export.php
-     * @param string $passPhrase   Must be used if the specified key is encrypted (protected by a passphrase)
+     * @param null|string $passPhrase   Must be used if the specified key is encrypted (protected by a passphrase)
      * @return resource    type 'OpenSSL key'
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPrivateKeyAsResource( $passPhrase = null ) {
+    public function getPrivateKeyAsResource( $passPhrase = null )
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         $keyResource = self::getPrivate(
             $this->export( $passPhrase ),
@@ -316,13 +367,18 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *
      * @link https://www.php.net/manual/en/function.openssl-pkey-export-to-file.php
      * @param string $fileName      Path to the output file.
-     * @param string $passPhrase
-     * @param array  $configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs    If null, uses 'instance create'-configArgs, if set
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function exportToFile( $fileName, $passPhrase = null, $configArgs = null ) {
+    public function exportToFile(
+        string $fileName,
+        $passPhrase = null,
+        $configArgs = null
+    ) : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isPkeyResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -335,16 +391,30 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_pkey_export_to_file( $this->pkeyResource, $fileName, $passPhrase, $configArgs );
+            $result = openssl_pkey_export_to_file(
+                $this->pkeyResource,
+                $fileName,
+                $passPhrase,
+                $configArgs
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $this;
@@ -354,13 +424,18 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * Save an exportable (string) PEM representation of a private key into a file - alias of exportToFile
      *
      * @param string $fileName      Path to the output file.
-     * @param string $passPhrase
-     * @param array  $configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs    If null, uses 'instance create'-configArgs, if set
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function savePrivateKeyIntoPemFile( $fileName, $passPhrase = null, $configArgs = null ) {
+    public function savePrivateKeyIntoPemFile(
+        string $fileName,
+        $passPhrase = null,
+        $configArgs = null
+    ) : self
+    {
         return $this->exportToFile( $fileName, $passPhrase, $configArgs );
     }
 
@@ -368,15 +443,20 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * Save an exportable (string) DER representation of a private key into a file - extends export
      *
      * @param string $fileName      Path to the output file.
-     * @param string $passPhrase
-     * @param array  $configArgs    If null, uses 'instance create'-configArgs, if set
+     * @param null|string $passPhrase
+     * @param null|array  $configArgs    If null, uses 'instance create'-configArgs, if set
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function savePrivateKeyIntoDerFile( $fileName, $passPhrase = null, $configArgs = null ) {
+    public function savePrivateKeyIntoDerFile(
+        string $fileName,
+        $passPhrase = null,
+        $configArgs = null
+    ) : self
+    {
         Assert::fileNameWrite( $fileName );
-        self::assertPassPhrase( $passPhrase );
+        $passPhrase = self::assertPassPhrase( $passPhrase );
         $configArgs = $this->getConfig( $configArgs );
         Workshop::saveDataToFile( $fileName, $this->export( $passPhrase, $configArgs ));
         return $this;
@@ -390,13 +470,14 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *                               2. A string having the format (file://)path/to/file.pem.
      *                                  The named file must contain a PEM encoded certificate/private key (it may contain both).
      *                               3. A string, PEM formatted private key.
-     * @param string $passPhrase   Must be used if the specified key is encrypted (protected by a passphrase)
+     * @param null|string $passPhrase
+     *                               Must be used if the specified key is encrypted (protected by a passphrase)
      * @return resource     type 'OpenSSL key'
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getPrivate( $key,  $passPhrase = null ) {
+    public static function getPrivate( $key,  $passPhrase = null )
+    {
         $logger     = LoggerDepot::getLogger( get_called_class());
         $logger->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         $key = self::assertPkey( $key, 1 );
@@ -405,16 +486,27 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_pkey_get_private( $key, $passPhrase );
+            $result = empty( $passPhrase )
+                ? openssl_pkey_get_private( $key )
+                : openssl_pkey_get_private( $key, $passPhrase );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch( self::getCm(
+                __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $logger->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $result;
@@ -433,7 +525,8 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getDetails() {
+    public function getDetails() : array
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isPkeyResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -445,13 +538,22 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
             $result = openssl_pkey_get_details( $this->pkeyResource );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch( self::getCm(
+                __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $result;
@@ -460,13 +562,14 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /*
      * Return bool true if pKey details key (/subkey) is set
      *
-     * @param string $key      see OpenSSLInterface constants
-     * @param string $subKey   see OpenSSLInterface constants
+     * @param null|string $key      see OpenSSLInterface constants
+     * @param null|string $subKey   see OpenSSLInterface constants
      * @return bool            true if found
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function isDetailsKeySet( $key = null, $subKey = null ) {
+    public function isDetailsKeySet( $key = null, $subKey = null ) : bool
+    {
         if( ! $this->isPkeyResourceSet()) {
             return false;
         }
@@ -476,51 +579,60 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     /*
      * Return pKey details (key(/subkey)), null if not found
      *
-     * @param string $key      see OpenSSLInterface constants
-     * @param string $subKey   see OpenSSLInterface constants
-     * @param bool $toBase64   if key(/subKey) set, true (default) output in Base64, false not
+     * @param null|string $key      see OpenSSLInterface constants
+     * @param null|string $subKey   see OpenSSLInterface constants
+     * @param null|bool $toBase64   if key(/subKey) set, true (default) output in Base64, false not
      * @return string|array    null if not found
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function getDetailsKey( $key = null, $subKey = null, $toBase64 = true  ) {
+    public function getDetailsKey( $key = null, $subKey = null, $toBase64 = true  )
+    {
         if( ! $this->isPkeyResourceSet()) {
             return null;
         }
-        Assert::bool( $toBase64, 3, true );
+        $toBase64 = Assert::bool( $toBase64, 3, true );
         $result = parent::getSource( $this->getDetails(), $key,  $subKey );
         if( is_null( $result )) {
             return null;
         }
-        return ( ! is_array( $result ) && $toBase64 ) ? Convert::base64Encode( $result ) : $result;
+        return ( ! is_array( $result ) && $toBase64 )
+            ? Convert::base64Encode( $result )
+            : $result;
     }
 
     /*
      * Return pKey details RSA modulus (details[rsa][n]), null if not found
      *
-     * @param bool $toBase64   default true, output in Base64, false binary string
-     * @return string          null if not found
+     * @param $toBase64bool $toBase64   default true, output in Base64, false binary string
+     * @return null|string     bool null if not found
      * @throws RunTimeException
      */
-    public function getDetailsRsaModulus( $toBase64 = true ) {
-        Assert::bool( $toBase64, 1, true );
-        $source = $this->isPkeyResourceSet() ? $this->getDetails() : null;
-        $result =  parent::getSource( $source, self::RSA,  self::N );
-        return ( ! is_null( $result ) && $toBase64 ) ? Convert::base64Encode( $result ) : $result;
+    public function getDetailsRsaModulus( $toBase64 = true )
+    {
+        $toBase64 = Assert::bool( $toBase64, 1, true );
+        $source   = $this->isPkeyResourceSet() ? $this->getDetails() : null;
+        $result   = parent::getSource( $source, self::RSA,  self::N );
+        return ( ! is_null( $result ) && $toBase64 )
+            ? Convert::base64Encode( $result )
+            : $result;
     }
 
     /*
      * Return pKey details RSA public exponent (details[rsa][e]), null if not found
      *
      * @param bool $toBase64   default true, output in Base64, false binary string
-     * @return string          null if not found
+     * @return null|string     bool null if not found
      * @throws RunTimeException
      */
-    public function getDetailsRsaExponent( $toBase64 = true ) {
+    public function getDetailsRsaExponent( $toBase64 = true )
+    {
         Assert::bool( $toBase64, 1, true );
         $source = $this->isPkeyResourceSet() ? $this->getDetails() : null;
         $result = parent::getSource( $source, self::RSA,  self::E );
-        return ( ! is_null( $result ) && $toBase64 ) ? Convert::base64Encode( $result ) : $result;
+        return ( ! is_null( $result ) && $toBase64 )
+            ? Convert::base64Encode( $result )
+            : $result;
     }
 
 
@@ -532,7 +644,8 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPublicKeyAsPemString() {
+    public function getPublicKeyAsPemString() : string
+    {
         return $this->getDetails()[self::KEY];
     }
 
@@ -544,7 +657,8 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getPublicKeyAsDerString() {
+    public function getPublicKeyAsDerString() : string
+    {
         return self::pem2Der( $this->getDetails()[self::KEY] );
     }
 
@@ -556,7 +670,8 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function savePublicKeyIntoPemFile( $fileName ) {
+    public function savePublicKeyIntoPemFile( string $fileName ) : self
+    {
         Assert::fileNameWrite( $fileName, 1 );
         Workshop::saveDataToFile( $fileName, $this->getDetails()[self::KEY] );
         return $this;
@@ -570,9 +685,13 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function savePublicKeyIntoDerFile( $fileName ) {
+    public function savePublicKeyIntoDerFile( string $fileName ) : self
+    {
         Assert::fileNameWrite( $fileName, 1 );
-        Workshop::saveDataToFile( $fileName, self::pem2Der( $this->getDetails()[self::KEY] ));
+        Workshop::saveDataToFile(
+            $fileName,
+            self::pem2Der( $this->getDetails()[self::KEY] )
+        );
         return $this;
     }
 
@@ -582,7 +701,8 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @return resource     with type 'OpenSSL key'
      * @throws InvalidArgumentException
      */
-    public function getPublicKeyResource() {
+    public function getPublicKeyResource()
+    {
         return self::getPublic( $this->getDetails()[self::KEY] );
     }
 
@@ -598,9 +718,9 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @return resource     with type 'OpenSSL key'
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getPublic( $certificate ) {
+    public static function getPublic( $certificate )
+    {
         $logger = LoggerDepot::getLogger( get_called_class());
         $logger->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         $certificate = ( self::isValidPkeyResource( $certificate ))
@@ -613,13 +733,22 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
             $result = openssl_pkey_get_public( $certificate );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $logger->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $result;
@@ -635,9 +764,9 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @return resource     with type 'OpenSSL key'
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getPublicKeyAsResource( $certificate ) {
+    public static function getPublicKeyAsResource( $certificate )
+    {
         return self::getPublic( $certificate );
     }
 
@@ -655,19 +784,24 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *                                     4 For private keys, you may also use the syntax array($key, $passphrase)
      *                                       where $key represents a key specified using the file or textual content notation above,
      *                                       and $passphrase represents a string containing the passphrase for that private key
-     * @param int|string $argIx
-     * @param bool $fileToString
+     * @param null|int|string $argIx
+     * @param null|bool $fileToString
      * @return resource|string|array       if file, 'file://'-prefixed
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertPkey( $pKey, $argIx = null, $fileToString = false ) {
+    public static function assertPkey( $pKey, $argIx = null, $fileToString = false )
+    {
         $passPhrase = null;
         if( is_array( $pKey )) {
             $passPhrase = OpenSSLBaseFactory::assertPassPhrase( end( $pKey ), $argIx );
             $pKey       = reset( $pKey );
         }
-        $pKey = parent::assertResourceFileStringPem( $pKey, $argIx, $fileToString, self::PKEYRESOURCETYPE );
+        $pKey = parent::assertResourceFileStringPem(
+            $pKey,
+            $argIx,
+            $fileToString,
+            self::PKEYRESOURCETYPE
+        );
         return ( empty( $passPhrase )) ? $pKey : [ $pKey, $passPhrase ];
     }
 
@@ -676,9 +810,9 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *
      * @param string|resource $pkeyResource
      * @return bool
-     * @static
      */
-    public static function isValidPkeyResource( $pkeyResource ) {
+    public static function isValidPkeyResource( $pkeyResource ) : bool
+    {
         return parent::isValidResource( $pkeyResource, self::PKEYRESOURCETYPE );
     }
 
@@ -688,7 +822,8 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      * @link https://www.php.net/manual/en/function.openssl-pkey-free.php
      * @return static
      */
-    public function freePkeyResource() {
+    public function freePkeyResource() : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ )); // test ###
         if( $this->isPkeyResourceSet()) {
             set_error_handler( self::$ERRORHANDLER );
@@ -709,21 +844,27 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
      *
      * @return resource
      */
-    public function getPkeyResource() {
+    public function getPkeyResource()
+    {
         return $this->pkeyResource;
     }
 
     /**
      * @return bool
      */
-    public function isPkeyResourceSet() {
+    public function isPkeyResourceSet() : bool
+    {
         if( empty( $this->pkeyResource )) {
             return false;
         }
         if( ! self::isValidPkeyResource( $this->pkeyResource )) {
             $this->log(
                 LogLevel::WARNING,
-                self::getErrRscMsg( __METHOD__, self::PKEYRESOURCETYPE, $this->pkeyResource )
+                self::getErrRscMsg(
+                    __METHOD__,
+                    self::PKEYRESOURCETYPE,
+                    $this->pkeyResource
+                )
             );
             return false;
         }
@@ -731,19 +872,26 @@ class OpenSSLPkeyFactory extends OpenSSLBaseFactory2
     }
 
     /**
-     * @param resource pkeyResource
+     * @param resource $pkeyResource
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setPkeyResource( $pkeyResource ) {
+    public function setPkeyResource( $pkeyResource ) : self
+    {
         if( ! self::isValidPkeyResource( $pkeyResource )) {
-            $msg = self::getErrRscMsg( __METHOD__, self::PKEYRESOURCETYPE, $pkeyResource );
+            $msg = self::getErrRscMsg(
+                __METHOD__,
+                self::PKEYRESOURCETYPE,
+                $pkeyResource
+            );
             $this->log( LogLevel::ERROR,  $msg );
             throw new InvalidArgumentException( $msg );
         }
         $this->pkeyResource = $pkeyResource;
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
+        $this->log(
+            LogLevel::DEBUG,
+            self::$PASSED . self::getCm( __METHOD__ )
+        ); // test ###
         return $this;
     }
-
 }

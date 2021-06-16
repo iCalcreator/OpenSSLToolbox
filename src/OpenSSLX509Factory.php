@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -77,24 +75,23 @@ use function strtoupper;
  */
 class OpenSSLX509Factory extends OpenSSLBaseFactory
 {
-
     /**
      * constants
      */
     const X509RESOURCETYPE  = 'OpenSSL X.509';
 
     /**
-     * @var String/resource  1. An X.509 resource returned from openssl_x509_read()
-     *                       2. A string having the format (file://)path/to/cert.pem
-     *                          The named file must contain a (single) PEM encoded certificate
-     *                       3. A string containing the content of a (single) PEM encoded certificate
-     * @access private
+     * @var string|resource
+     *
+     * 1. An X.509 resource returned from openssl_x509_read()
+     * 2. A string having the format (file://)path/to/cert.pem
+     *    The named file must contain a (single) PEM encoded certificate
+     * 3. A string containing the content of a (single) PEM encoded certificate
      */
     private $x509certData;
 
     /**
      * @var resource
-     * @access private
      */
     private $x509Resource = null;
 
@@ -102,7 +99,9 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Class constructor
      *
      * If argument x509certData is set, a new X509 resource is set
-     * @param string|resource $x509certData 1. An X.509 resource returned from openssl_x509_read()
+     *
+     * @param null|string|resource $x509certData
+     *                                      1. An X.509 resource returned from openssl_x509_read()
      *                                      2. A string having the format (file://)path/to/cert.pem;
      *                                         the named file must contain a (single) PEM encoded certificate
      *                                      3. A string containing the content of a (single) PEM encoded certificate
@@ -121,16 +120,17 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
     /**
      * Class factory method
      *
-     * @param string|resource $x509certData 1. An X.509 resource returned from openssl_x509_read()
+     * @param null|string|resource $x509certData
+     *                                      1. An X.509 resource returned from openssl_x509_read()
      *                                      2. A string having the format (file://)path/to/cert.pem;
      *                                         the named file must contain a (single) PEM encoded certificate
      *                                      3. A string containing the content of a (single) PEM encoded certificate
-     * @throws InvalidArgumentException
-     * @throws RunTimeException
      * @return static
-     * @access static
+     *@throws RunTimeException
+     * @throws InvalidArgumentException
      */
-    public static function factory( $x509certData = null ) {
+    public static function factory( $x509certData = null ) : self
+    {
         return new self( $x509certData );
     }
 
@@ -151,25 +151,45 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *                             2. PEM string
      *                             3. ('file://')fileName with PEM string content
      *                             4. array(2/3, passPhrase)
-     * @param array $configArgs    Finetuning the CSR signing
-     * @param array $extraAttribs  Additional configuration options for the CSR
+     * @param null|array $configArgs    Finetuning the CSR signing
+     * @param null|array $extraAttribs  Additional configuration options for the CSR
      *                             Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
-     * @param int   $days          Length of time for which the generated certificate will be valid, in days (default 365).
-     * @param int   $serial        Optional the serial number of issued certificate (default 0)
+     * @param null|int   $days     Length of time for which the generated certificate will be valid, in days (default 365).
+     * @param null|int   $serial   Optional the serial number of issued certificate (default 0)
      * @throws InvalidArgumentException
      * @throws RunTimeException
      * @return static
-     * @access static
      */
     public static function csrFactory(
-        $caCert, array $dn, $privateKeyId, $configArgs = null, $extraAttribs = null, $days = 365, $serial = 0
-    ) {
+        $caCert,
+        array $dn,
+        $privateKeyId,
+        $configArgs = null,
+        $extraAttribs = null,
+        $days = 365,
+        $serial = 0
+    ) : self
+    {
         $logger      = LoggerDepot::getLogger( get_class());
-        $logger->log( LogLevel::INFO, strtoupper( self::$INIT ) . self::getCm( __METHOD__ ));
-        $csrFactory  = OpenSSLCsrFactory::factory( $dn, $privateKeyId, $configArgs, $extraAttribs );
-        $csrResource = $csrFactory->getX509CertResource( $caCert, $privateKeyId, $days, $configArgs, $serial );
+        $logger->log(
+            LogLevel::INFO,
+            strtoupper( self::$INIT ) . self::getCm( __METHOD__ )
+        );
+        $csrFactory  = OpenSSLCsrFactory::factory(
+            $dn,
+            $privateKeyId,
+            $configArgs,
+            $extraAttribs
+        );
+        $csrResource = $csrFactory->getX509CertResource(
+            $caCert,
+            $privateKeyId,
+            $days,
+            $configArgs,
+            $serial
+        );
         $x509String  = self::factory( $csrResource )->getX509CertAsPemString();
-        $logger->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $logger->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return new self( $x509String );
     }
 
@@ -186,13 +206,17 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *                                        The named file must contain a PEM encoded certificate/private key (it may contain both).
      *                                     3. A string, PEM formatted private key.
      *                                     4 array ( 2/3, passPhrase )
-     * @param string $passPhrase
+     * @param null|string $passPhrase
      * @return bool
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function checkPrivateKey( $key, $passPhrase = null ) {
-        $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
+    public function checkPrivateKey( $key, $passPhrase = null ) : bool
+    {
+        $this->log(
+            LogLevel::DEBUG,
+            self::$INIT . self::getCm( __METHOD__ )
+        );
         if( ! $this->isX509ResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
         }
@@ -208,12 +232,17 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
             $result = openssl_x509_check_private_key( $this->x509Resource , $key );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, false, self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                false,
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return (bool) $result;
     }
 
@@ -230,25 +259,33 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *     X509_PURPOSE_CRL_SIGN       Can the cert be used to sign a certificate revocation list (CRL)?
      *     X509_PURPOSE_ANY            Can the cert be used for Any/All purposes?
      *     These options are not bitfields - you may specify one only!
-     * @param array $caInfo          an array containing file and directory names
+     * @param null|array $caInfo     An array containing file and directory names
      *                               that specify the locations of trusted CA files.
      *                               If a directory is specified,
      *                               then it must be a correctly formed hashed directory
      *                               as the openssl command would use.
-     * @param string $unTrustedFile  If specified, this should be the name of a (single) PEM encoded file holding certificates
+     * @param null|string $unTrustedFile
+     *                               If specified, this should be the name of a (single) PEM encoded file holding certificates
      *                               that can be used to help verify the certificate,
      *                               although no trust is placed in the certificates that come from that file.
      * @return bool
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function checkPurpose( $purpose, $caInfo = [], $unTrustedFile = null  ) {
+    public function checkPurpose(
+        int $purpose,
+        $caInfo = [],
+        $unTrustedFile = null
+    ) : bool
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isX509ResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
         }
         self::assertPurpose( $purpose );
-        self::assertCaInfo( $caInfo, 2 );
+        if( ! empty( $caInfo )) {
+            self::assertCaInfo( $caInfo, 2 );
+        }
         if( ! empty( $unTrustedFile )) {
             Assert::fileNameRead( $unTrustedFile, 3 );
         }
@@ -261,23 +298,41 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
                     $result = openssl_x509_checkpurpose( $this->x509Resource, $purpose );
                     break;
                 case empty( $unTrustedFile ) ;
-                    $result = openssl_x509_checkpurpose( $this->x509Resource, $purpose, $caInfo );
+                    $result = openssl_x509_checkpurpose(
+                        $this->x509Resource,
+                        $purpose,
+                        $caInfo
+                    );
                     break;
                 default :
-                    $result = openssl_x509_checkpurpose( $this->x509Resource, $purpose, $caInfo, $unTrustedFile );
+                    $result = openssl_x509_checkpurpose(
+                        $this->x509Resource,
+                        $purpose,
+                        $caInfo,
+                        $unTrustedFile
+                    );
                     break;
             }
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( -1 != $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( -1 != $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( -1 == $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $result;
     }
 
@@ -285,46 +340,60 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Return (string) an X509 certificate in a (single) PEM encoded format - uses openssl_x509_export
      *
      * @link https://www.php.net/manual/en/function.openssl-x509-export.php
-     * @param bool   $noText    optional, affects the verbosity of the output;
+     * @param null|bool   $noText    optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return string           an X509 certificate in a PEM encoded format
      * @throws RuntimeException
      */
-    public function export( $noText = true ) {
+    public function export( $noText = true ) : string
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isX509ResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
         }
-        $noText = Assert::bool( $noText, 1, true );
         $result = false;
         $output = null;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_x509_export( $this->x509Resource, $output, $noText );
+            $result = openssl_x509_export(
+                $this->x509Resource,
+                $output,
+                ( $noText ?? true )
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $output;
     }
 
     /**
      * Return (string) an X509 certificate in a (single) PEM encoded format - alias of export
      *
-     * @param bool   $noText    optional, affects the verbosity of the output;
+     * @param null|bool $noText optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return string           an X509 certificate in a PEM encoded format
      * @throws RuntimeException
      */
-    public function getX509CertAsPemString( $noText = true ) {
+    public function getX509CertAsPemString( $noText = true ) : string
+    {
         return $this->export( $noText );
     }
 
@@ -334,7 +403,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @return string           an X509 certificate in a DER encoded format
      * @throws RuntimeException
      */
-    public function getX509CertAsDerString() {
+    public function getX509CertAsDerString() : string
+    {
         return self::pem2Der( $this->export( true ));
     }
 
@@ -342,37 +412,50 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Save ( PEM encoded) information from an X509 certificate to named fileName - uses openssl_x509_export_to_file
      *
      * @link https://www.php.net/manual/en/function.openssl-x509-export-to-file.php
-     * @param string $fileName  Path to the output file. (ext pem, crt, cer)
-     * @param bool   $noText    optional, affects the verbosity of the output;
-     *                          if it is FALSE, then additional human-readable information is included in the output.
+     * @param string $fileName   Path to the output file. (ext pem, crt, cer)
+     * @param null|bool $noText  optional, affects the verbosity of the output;
+     *                            if it is FALSE, then additional human-readable information is included in the output.
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function exportToFile( $fileName, $noText = true ) {
+    public function exportToFile( string $fileName, $noText = true ) : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isX509ResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
         }
         $fileName = Workshop::getFileWithoutProtoPrefix( $fileName );
         Assert::fileNameWrite( $fileName, 1 );
-        $noText = Assert::bool( $noText, 2, true );
         $result = false;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_x509_export_to_file( $this->x509Resource, $fileName, $noText );
+            $result = openssl_x509_export_to_file(
+                $this->x509Resource,
+                $fileName,
+                ( $noText ?? true )
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $this;
     }
 
@@ -380,13 +463,14 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Save (PEM encoded) information from an X509 certificate to named fileName - alias of exportToFile
      *
      * @param string $fileName  Path to the output file. (ext pem, crt, cer)
-     * @param bool   $noText    optional, affects the verbosity of the output;
+     * @param null|bool $noText Optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function saveX509CertIntoPemFile( $fileName, $noText = true ) {
+    public function saveX509CertIntoPemFile( string $fileName, $noText = true ) : self
+    {
         return $this->exportToFile( $fileName, $noText );
     }
 
@@ -398,7 +482,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function saveX509CertIntoDerFile( $fileName ) {
+    public function saveX509CertIntoDerFile( string $fileName ) : self
+    {
         Assert::fileNameWrite( $fileName );
         $fileName = Workshop::getFileWithoutProtoPrefix( $fileName );
         Workshop::saveDataToFile( $fileName, self::pem2Der( $this->export( true )));
@@ -409,13 +494,15 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Return the fingerprint, or digest, of a given X.509 certificate - uses openssl_x509_fingerprint
      *
      * @link https://www.php.net/manual/en/function.openssl-x509-fingerprint.php
-     * @param string $hashAlgorithm   The digest method or hash algorithm to use, default "sha1"
-     * @param bool   $rawOutput       TRUE, outputs raw binary data. FALSE (default) outputs lowercase hexits
+     * @param null|string $hashAlgorithm
+     *                                The digest method or hash algorithm to use, default "sha1"
+     * @param null|bool   $rawOutput  TRUE, outputs raw binary data. FALSE (default) outputs lowercase hexits
      * @return string                 a (hex) string containing the calculated certificate fingerprint
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function fingerprint( $hashAlgorithm = null, $rawOutput = false ) {
+    public function fingerprint( $hashAlgorithm = null, $rawOutput = false ) : string
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isX509ResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -424,36 +511,50 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
             $hashAlgorithm = self::$HASHALGORITHMDEFAULT;
         }
         self::assertMdAlgorithm( $hashAlgorithm );
-        $rawOutput = Assert::bool( $rawOutput, 2, false );
         $output    = null;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $output = openssl_x509_fingerprint( $this->x509Resource, $hashAlgorithm, $rawOutput );
+            $output = openssl_x509_fingerprint(
+                $this->x509Resource,
+                $hashAlgorithm,
+                ( $rawOutput ?? false )
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $output ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $output ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $output ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $output;
     }
 
     /**
      * Return the fingerprint, or digest, of a given X.509 certificate - alias of fingerprint
      *
-     * @param string $hashAlgorithm   The digest method or hash algorithm to use, default "sha1"
-     * @param bool   $rawOutput       When set to TRUE, outputs raw binary data. FALSE outputs lowercase hexits.
+     * @param null|string $hashAlgorithm
+     *                                The digest method or hash algorithm to use, default "sha1"
+     * @param null|bool   $rawOutput  When set to TRUE, outputs raw binary data. FALSE outputs lowercase hexits.
      * @return string                 a (hex) string containing the calculated certificate fingerprint
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getDigestHash( $hashAlgorithm = null, $rawOutput = false ) {
+    public function getDigestHash( $hashAlgorithm = null, $rawOutput = false ) : string
+    {
         return $this->fingerprint( $hashAlgorithm, $rawOutput );
     }
 
@@ -461,47 +562,58 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Return (array) information from X509 certificate - uses openssl_x509_parse
      *
      * @link https://www.php.net/manual/en/function.openssl-x509-parse.php
-     * @param bool $shortNames controls how the data is indexed in the array
+     * @param null|bool $shortNames controls how the data is indexed in the array
      *                         if shortNames is TRUE (the default) then fields will be indexed with the short name form,
      *                         otherwise, the long name form will be used - e.g.: CN is the shortName form of commonName.
      * @return array
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function parse( $shortNames = true ) {
+    public function parse( $shortNames = true ) : array
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isX509ResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
         }
-        $shortNames = Assert::bool( $shortNames, 1, true );
         $certArray  = false;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $certArray = openssl_x509_parse( $this->x509Resource, $shortNames );
+            $certArray = openssl_x509_parse( $this->x509Resource, ( $shortNames ?? true ));
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $certArray ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $certArray ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $certArray ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $certArray;
     }
 
     /**
      * Return (array/string) information from X509 certificate - extends openssl_x509_parse
      *
-     * @param bool $shortNames controls how the data is indexed in the array
+     * @param null|bool $shortNames
+     *                         controls how the data is indexed in the array
      *                         if shortNames is TRUE (the default) then fields will be indexed with the short name form,
      *                         otherwise, the long name form will be used - e.g.: CN is the shortName form of commonName.
-     * @param string $key      certificate information (array-)key, default null
+     * @param null|string $key certificate information (array-)key, default null
      *                         see OpenSSLInterface constants
-     * @param string $subKey   certificate information (array-)key/subKey, default null
+     * @param null|string $subKey
+     *                         certificate information (array-)key/subKey, default null
      *                         see OpenSSLInterface constants
      * @return array|string    info array or info[key], null on not found
      * @throws InvalidArgumentException
@@ -517,10 +629,11 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
     /**
      * Return subject DN (array) information from X509 certificate - extends openssl_x509_parse
      *
-     * @param bool $shortNames controls how the data is indexed in the array
+     * @param null|bool $shortNames
+     *                         controls how the data is indexed in the array
      *                         if shortNames is TRUE (the default) then fields will be indexed with the short name form,
      *                         otherwise, the long name form will be used - e.g.: CN is the shortName form of commonName.
-     * @param string $key      subject DN key, MUST match shortName arg, default null
+     * @param null|string $key subject DN key, MUST match shortName arg, default null
      *                         see OpenSSLInterface constants
      * @return array|string    subject DN array, or subject[DNkey], null is not found
      *                         see OpenSSLInterface constants
@@ -534,10 +647,10 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
     /**
      * Return issuer DN (array) information from X509 certificate - extends openssl_x509_parse
      *
-     * @param bool $shortNames controls how the data is indexed in the array
+     * @param null|bool $shortNames controls how the data is indexed in the array
      *                         if shortNames is TRUE (the default) then fields will be indexed with the short name form,
      *                         otherwise, the long name form will be used - e.g.: CN is the shortName form of commonName.
-     * @param string $key      subject issuer DN key, MUST match shortName arg, default null
+     * @param null|string $key      subject issuer DN key, MUST match shortName arg, default null
      *                         see OpenSSLInterface constants
      * @return array|string    subject issuer DN array, or subject[issuerDNkey] value , null is not found
      *                         see OpenSSLInterface constants
@@ -551,26 +664,36 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
     /*
      * Return bool true if parse certInfoKey (/subkey) is set
      *
-     * @param bool  $shortNames
-     * @param string $certInfoKey   see OpenSSLInterface constants
+     * @param null|bool  $shortNames
+     * @param null|string $certInfoKey   see OpenSSLInterface constants
      * @param string $subKey        see OpenSSLInterface constants
      * @return bool                 true if parse array key(/subKey) is set
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function isCertInfoKeySet( $shortNames = true, $certInfoKey = null, $subKey = null ) {
+    public function isCertInfoKeySet(
+        $shortNames = true,
+        $certInfoKey = null,
+        $subKey = null
+    ) : bool
+    {
         static $FMT = 'certInfoKey required';
         if( empty( $certInfoKey )) {
             throw new InvalidArgumentException( $FMT );
         }
-        return parent::isSourceKeySet( $this->parse( $shortNames ), $certInfoKey,  $subKey );
+        return parent::isSourceKeySet(
+            $this->parse( $shortNames ),
+            $certInfoKey,
+            $subKey
+        );
     }
 
     /**
      * Set resource identifier from a parsed X.509 certificate - uses openssl_x509_read
      *
      * @link https://www.php.net/manual/en/function.openssl-x509-read.php
-     * @param string $x509certData  1. An X.509 resource (returned from openssl_x509_read())
+     * @param null|string $x509certData
+     *                              1. An X.509 resource (returned from openssl_x509_read())
      *                              2. A string having the format (file://)path/to/cert.pem;
      *                                 the named file must contain a (single) PEM encoded certificate
      *                              3. A string containing a (single) PEM encoded certificate
@@ -578,7 +701,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function read( $x509certData = null ) {
+    public function read( $x509certData = null ) : self
+    {
         static $FMTERR1 = 'argument x509certData is required';
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( empty( $x509certData )) {
@@ -597,16 +721,25 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
             $x509Resource = openssl_x509_read( $x509certData );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $x509Resource ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $x509Resource ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $x509Resource ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $this->setX509Resource( $x509Resource );
-        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ));
+        $this->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ )); // test ###
         return $this;
     }
 
@@ -619,7 +752,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function createX509ResourceFromString( $x509CertificateString ) {
+    public function createX509ResourceFromString( string $x509CertificateString ) : self
+    {
         self::assertPemString( $x509CertificateString );
         return $this->read( $x509CertificateString );
     }
@@ -634,7 +768,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function createX509ResourceFromFile( $x509CertificateFile ) {
+    public function createX509ResourceFromFile( string $x509CertificateFile ) : self
+    {
         Assert::fileNameRead( $x509CertificateFile );
         $this->read( $x509CertificateFile );
         return $this;
@@ -646,7 +781,6 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
 
     /**
      * @var string fingerprint method algorithm default
-     * @static
      */
     public static $HASHALGORITHMDEFAULT = 'sha1';
 
@@ -657,16 +791,25 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *                               2. A string having the format (file://)path/to/cert.pem
      *                                  The named file must contain a (single) PEM encoded certificate
      *                               3. A string containing a (single) PEM encoded certificate
-     * @param int|string $argIx
-     * @param bool $fileToString
-     * @param bool $keyType          true on key, false on cert
+     * @param null|int|string $argIx
+     * @param null|bool $fileToString
+     * @param null|bool $keyType          true on key, false on cert
      * @return resource|string       if file, 'file://'-prefixed
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertX509( $x509, $argIx = null, $fileToString = false, $keyType = true ) {
+    public static function assertX509(
+        $x509,
+        $argIx = null,
+        $fileToString = false,
+        $keyType = true
+    )
+    {
         return parent::assertResourceFileStringPem(
-            $x509, $argIx, $fileToString, self::X509RESOURCETYPE, $keyType
+            $x509,
+            $argIx,
+            $fileToString,
+            self::X509RESOURCETYPE,
+            $keyType
         );
     }
 
@@ -675,9 +818,9 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *
      * @param string|resource $x509
      * @return bool
-     * @static
      */
-    public static function isValidX509Resource( $x509 ) {
+    public static function isValidX509Resource( $x509 ) : bool
+    {
         return parent::isValidResource( $x509, self::X509RESOURCETYPE );
     }
 
@@ -685,13 +828,13 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * Assert caInfo array contains valid (readable) fileNames or directories
      *
      * @param array $caInfo
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertCaInfo( array $caInfo, $argIx = null ) {
+    public static function assertCaInfo( array $caInfo, $argIx = null )
+    {
         if( ! empty( $caInfo )) {
-            foreach( $caInfo as $x =>$caParameter ) {
+            foreach( $caInfo as $caParameter ) {
                 Assert::fileName( $caParameter, $argIx );
             }
         }
@@ -703,8 +846,6 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @link https://www.php.net/manual/en/openssl.purpose-check.php
      * @param int $purpose
      * @throws InvalidArgumentException
-     * @access private
-     * @static
      */
     private static function assertPurpose( $purpose ) {
         static $FMTERR1 = 'Invalid purpose';
@@ -727,7 +868,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *
      * @return static
      */
-    public function freeX509certData() {
+    public function freeX509certData() : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( $this->isX509certDataSet()) {
             self::freeResource( $this->x509certData );
@@ -739,14 +881,16 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
     /**
      * @return string|resource
      */
-    public function getX509certData() {
+    public function getX509certData()
+    {
         return $this->x509certData;
     }
 
     /**
      * @return bool
      */
-    public function isX509certDataSet() {
+    public function isX509certDataSet() : bool
+    {
         if( empty( $this->x509certData )) {
             return false;
         }
@@ -754,7 +898,11 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
             return true;
         }
         if( ! self::isValidX509Resource( $this->x509certData )) {
-            $msg = self::getErrRscMsg( __METHOD__, self::X509RESOURCETYPE, $this->x509certData );
+            $msg = self::getErrRscMsg(
+                __METHOD__,
+                self::X509RESOURCETYPE,
+                $this->x509certData
+            );
             $this->log( LogLevel::WARNING, $msg );
             return false;
         }
@@ -770,7 +918,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function setX509certData( $x509certData ) {
+    public function setX509certData( $x509certData ) : self
+    {
         $this->x509certData = self::assertX509( $x509certData );
         return $this;
     }
@@ -780,7 +929,8 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      *
      * @return static
      */
-    public function freeX509Resource() {
+    public function freeX509Resource() : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( $this->isX509ResourceSet()) {
             self::freeResource( $this->x509Resource );
@@ -801,12 +951,17 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
     /**
      * @return bool
      */
-    public function isX509ResourceSet() {
+    public function isX509ResourceSet() : bool
+    {
         if( empty( $this->x509Resource )) {
             return false;
         }
         if( ! self::isValidX509Resource( $this->x509Resource )) {
-            $msg = self::getErrRscMsg( __METHOD__, self::X509RESOURCETYPE, $this->x509Resource );
+            $msg = self::getErrRscMsg(
+                __METHOD__,
+                self::X509RESOURCETYPE,
+                $this->x509Resource
+            );
             $this->log( LogLevel::WARNING, $msg );
             return false;
         }
@@ -818,9 +973,14 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setX509Resource( $x509Resource ) {
+    public function setX509Resource( $x509Resource ) : self
+    {
         if( ! self::isValidX509Resource( $x509Resource )) {
-            $msg = self::getErrRscMsg( __METHOD__, self::X509RESOURCETYPE, $this->x509Resource );
+            $msg = self::getErrRscMsg(
+                __METHOD__,
+                self::X509RESOURCETYPE,
+                $this->x509Resource
+            );
             $this->log( LogLevel::ERROR,  $msg );
             throw new InvalidArgumentException( $msg );
         }
@@ -846,5 +1006,4 @@ class OpenSSLX509Factory extends OpenSSLBaseFactory
             }
         }
     }
-
 }

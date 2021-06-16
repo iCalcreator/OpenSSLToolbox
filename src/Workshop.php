@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use InvalidArgumentException;
@@ -51,7 +49,6 @@ use function file_put_contents;
 use function fseek;
 use function get_resource_type;
 use function gettype;
-use function is_null;
 use function is_resource;
 use function openssl_random_pseudo_bytes;
 use function sprintf;
@@ -69,14 +66,11 @@ class Workshop extends BaseFactory
 {
     /**
      * $var string
-     * @static
      */
     public static $FILEPROTO = 'file://';
 
     /**
      * $var string  file resource type
-     * @access private
-     * @static
      */
     private static $STREAM = 'stream';
 
@@ -88,11 +82,11 @@ class Workshop extends BaseFactory
      * Return (key) metadata from streams/file pointers
      *
      * @param resource $resource
-     * @param string $key
+     * @param null|string $key
      * @return array|string (null if key if not found)
-     * @static
      */
-    public static function getResourceMetadata( $resource, $key = null ) {
+    public static function getResourceMetadata( $resource, $key = null )
+    {
         $metaData = stream_get_meta_data( $resource );
         if( empty( $key )) {
             return $metaData;
@@ -105,16 +99,14 @@ class Workshop extends BaseFactory
      *
      * @param string|resource $resource
      * @return string
-     * @static
      */
-    public static function getResourceType( $resource ) {
+    public static function getResourceType( $resource ) : string
+    {
         switch( true ) {
-            case ( is_null( $resource )) :
-                return null;
-                break;
+            case ( null === $resource ) :
+                return '';
             case ( is_resource( $resource )) :
                 return get_resource_type( $resource );
-                break;
             default :
                 return gettype( $resource );
         }
@@ -125,9 +117,9 @@ class Workshop extends BaseFactory
      *
      * @param resource $resource
      * @return bool
-     * @static
      */
-    public static function isFileResource( $resource ) {
+    public static function isFileResource( $resource ) : bool
+    {
         return ( self::$STREAM == self::getResourceType( $resource ));
     }
 
@@ -136,9 +128,9 @@ class Workshop extends BaseFactory
      *
      * @param resource $resource
      * @return bool
-     * @static
      */
-    public static function isResourceReadable( $resource ) {
+    public static function isResourceReadable( $resource ) : bool
+    {
         static $MODE  = 'mode';
         static $READC = 'r+';
         return ( false !== strpbrk( self::getResourceMetadata( $resource, $MODE ), $READC ));
@@ -146,11 +138,12 @@ class Workshop extends BaseFactory
 
     /**
      * Return bool true if resource is writeable
+     *
      * @param resource $resource
      * @return bool
-     * @static
      */
-    public static function isResourceWritable( $resource ) {
+    public static function isResourceWritable( $resource ) : bool
+    {
         static $MODE   = 'mode';
         static $WRITEC = 'waxc+';
         return ( false !== strpbrk( self::getResourceMetadata( $resource, $MODE ), $WRITEC ));
@@ -160,12 +153,12 @@ class Workshop extends BaseFactory
      * Return resource contents
      *
      * @param resource $resource
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @return string
      * @throws RuntimeException
-     * @static
      */
-    public static function getResourceContents( $resource, $argIx = null ) {
+    public static function getResourceContents( $resource, $argIx = null ) : string
+    {
         static $FMTERR1 = 'Resource is not readable';
         static $FMTERR2 = 'Resource seek error';
         static $FMTERR3 = 'Resource read content error';
@@ -188,9 +181,8 @@ class Workshop extends BaseFactory
      * @param resource $resource
      * @param string   $data
      * @throws RuntimeException
-     * @static
      */
-    public static function writeToResource( $resource, $data ) {
+    public static function writeToResource( $resource, string $data ) {
         static $FMT = 'File resource write error (#%d)';
         $result     = null;
         if( ! self::isResourceReadable( $resource )) {
@@ -215,12 +207,12 @@ class Workshop extends BaseFactory
      * Return file (resource) content
      *
      * @param string|resource $fileName
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getFileContent( $fileName, $argIx = null ) {
+    public static function getFileContent( $fileName, $argIx = null ) : string
+    {
         static $FMT = 'Can\'t read \'%s\'%s';
         if( is_resource( $fileName )) {
             return self::getResourceContents( $fileName );
@@ -229,7 +221,9 @@ class Workshop extends BaseFactory
         $fileName = self::getFileWithoutProtoPrefix( $fileName );
         $content = file_get_contents( $fileName );
         if( false === $content ) {
-            throw new InvalidArgumentException( sprintf( $FMT, $fileName, self::getErrArgNoText( $argIx )));
+            throw new InvalidArgumentException(
+                sprintf( $FMT, $fileName, self::getErrArgNoText( $argIx ))
+            );
         }
         return $content;
     }
@@ -242,10 +236,15 @@ class Workshop extends BaseFactory
      * @param int    $flags
      * @param resource $context
      * @throws RuntimeException
-     * @static
      * @todo https://www.php.net/manual/en/function.file-put-contents.php#123657
      */
-    public static function saveDataToFile( $fileName, $data, $flags = null, $context = null ) {
+    public static function saveDataToFile(
+        $fileName,
+        string $data,
+        $flags = null,
+        $context = null
+    )
+    {
         static $FMT = 'File write error ($%d) : %s';
         if( self::isFileResource( $fileName )) {
             self::writeToResource( $fileName, $data );
@@ -282,20 +281,25 @@ class Workshop extends BaseFactory
      * Return a new (and touched file), opt with ext, mode default 0600, if exists, it's cleared
      *
      * @param string $unique
-     * @param string $ext
-     * @param int    $mode (oct)  default 0600
+     * @param null|string $ext
+     * @param null|int    $mode (oct)  default 0600
      * @return string
-     * @static
      */
-    public static function getNewFileInTmp( $unique, $ext = null, $mode = 0600 ) {
+    public static function getNewFileInTmp(
+        string $unique,
+        $ext = null,
+        $mode = 0600
+    ) : string
+    {
         static $DOT = '.';
+        static $SP0 = '';
         $fileName   = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $unique;
         if( ! empty( $ext )) {
             $fileName .= $DOT . $ext;
         }
         touch( $fileName );
         chmod( $fileName, $mode );
-        self::saveDataToFile( $fileName, null );
+        self::saveDataToFile( $fileName, $SP0 );
         return $fileName;
     }
 
@@ -303,11 +307,13 @@ class Workshop extends BaseFactory
      * Return fileName without 'file://'-prefix
      *
      * @param string $fileName
-     * @return bool
-     * @static
+     * @return string
      */
-    public static function getFileWithoutProtoPrefix( $fileName ) {
-        return self::hasFileProtoPrefix( $fileName ) ? substr( $fileName, 7 ) : $fileName;
+    public static function getFileWithoutProtoPrefix( string $fileName ) : string
+    {
+        return self::hasFileProtoPrefix( $fileName )
+            ? substr( $fileName, 7 )
+            : $fileName;
     }
 
     /**
@@ -315,10 +321,14 @@ class Workshop extends BaseFactory
      *
      * @param string $fileName
      * @return bool
-     * @static
      */
-    public static function hasFileProtoPrefix( $fileName ) {
-        return ( 0 == strcasecmp( self::$FILEPROTO, substr( $fileName, 0, 7 )));
+    public static function hasFileProtoPrefix( string $fileName ) : bool
+    {
+        return ( 0 == strcasecmp(
+                self::$FILEPROTO,
+                substr( $fileName, 0, 7 )
+            )
+        );
     }
 
     /** ***********************************************************************
@@ -331,9 +341,12 @@ class Workshop extends BaseFactory
      * @param int $byteCnt
      * @param bool $cStrong
      * @return string
-     * @static
      */
-    public static function getRandomPseudoBytes( $byteCnt, & $cStrong = false ) {
+    public static function getRandomPseudoBytes(
+        int $byteCnt,
+        & $cStrong = false
+    ) : string
+    {
         static $MAX = 10;
         $cnt = 0;
         do {
@@ -348,9 +361,9 @@ class Workshop extends BaseFactory
      *
      * @param int $byteCnt
      * @return string
-     * @static
      */
-    public static function getSalt( $byteCnt = null ) {
+    public static function getSalt( $byteCnt = null ) : string
+    {
         if( empty( $byteCnt )) {
             $byteCnt = 64;
         }
@@ -364,9 +377,9 @@ class Workshop extends BaseFactory
      * @param string $identifier
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getAlgorithmFromIdentifier( $identifier ) {
+    public static function getAlgorithmFromIdentifier( string $identifier ) : string
+    {
         static $HASH  = '#';
         static $SLASH = '/';
         static $FMT   = 'Algorithm not found in \'%s\'';

@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -59,23 +57,32 @@ class PhpErrorException extends Exception
      * @param string $errfile
      * @param int    $errline
      * @throws PhpErrorException
-     * @static
      */
-    public static function PhpErrors2Exception( $errno, $errstr, $errfile, $errline ) {
+    public static function PhpErrors2Exception(
+        int $errno,
+        string $errstr,
+        string $errfile,
+        int $errline
+    )
+    {
         static $FMT = '%s, %s, %s:%d';
-        $message = sprintf( $FMT, PhpErrorException::getSeverityText( $errno ), $errstr, $errfile, $errline );
+        $message = sprintf(
+            $FMT,
+            PhpErrorException::getSeverityText( $errno ),
+            $errstr,
+            $errfile,
+            $errline
+        );
         throw new PhpErrorException( $message, 0, $errno, $errfile, $errline );
     }
 
     /**
      * @var int
-     * @access protected
      */
     protected $severity;
 
     /**
      * @var array
-     * @access private
      */
     private static $errorTexts = [
         E_ERROR             => 'ErrorException',
@@ -104,7 +111,8 @@ class PhpErrorException extends Exception
      * @param string $filename
      * @param int    $lineno
      */
-    public function __construct( $message, $code, $severity, $filename, $lineno ) {
+    public function __construct( $message, $code, $severity, $filename, $lineno )
+    {
         $this->message  = $message;
         $this->code     = $code;
         $this->severity = $severity;
@@ -117,7 +125,8 @@ class PhpErrorException extends Exception
      *
      * @return int
      */
-    public function getSeverity() {
+    public function getSeverity() : int
+    {
         return $this->severity;
     }
 
@@ -126,10 +135,12 @@ class PhpErrorException extends Exception
      *
      * @param int $errorNo
      * @return string
-     * @static
      */
-    public static function getSeverityText( $errorNo ) {
+    public static function getSeverityText( int $errorNo ) : string
+    {
         static $unknown = 'Unknown error';
-        return ( isset( self::$errorTexts[$errorNo] )) ? self::$errorTexts[$errorNo] : $unknown;
+        return ( isset( self::$errorTexts[$errorNo] ))
+            ? self::$errorTexts[$errorNo]
+            : $unknown;
     }
 }

@@ -4,33 +4,31 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  */
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Faker;
 use Exception;
+use Throwable;
 
 /**
  * Class OpenSSLPkcs7FactoryTest
@@ -85,9 +83,9 @@ class OpenSSLPkcs7FactoryTest extends OpenSSLTest
         $case    = 12;
         $outcome = true;
         try {
-            OpenSSLPkcs7Factory::assertflags( 'false' );
+            OpenSSLPkcs7Factory::assertFlags( 'false' );
         }
-        catch( exception $e ) {
+        catch( Throwable $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -97,9 +95,9 @@ class OpenSSLPkcs7FactoryTest extends OpenSSLTest
     }
 
     /**
-     * @param $certSource
-     * @param $privateSource
-     * @param $case
+     * @param mixed $certSource
+     * @param mixed $privateSource
+     * @param mixed $case
      */
     public function encryptDecryptTester2x( $certSource, $privateSource, $case ) {
         $faker   = Faker\Factory::create();
@@ -352,7 +350,7 @@ class OpenSSLPkcs7FactoryTest extends OpenSSLTest
         ];
 
         /* x509 cert without password */
-        $x509Factory    = OpenSSLX509Factory::csrfactory( null, self::getDN(), $privateKeyString, self::$config );
+        $x509Factory    = OpenSSLX509Factory::csrFactory( null, self::getDN(), $privateKeyString, self::$config );
         // get x509 cert as resource
         $x509Resource   = $x509Factory->getX509Resource();
         // get x509 cert as string
@@ -427,7 +425,7 @@ class OpenSSLPkcs7FactoryTest extends OpenSSLTest
 
         /* x509 cert with password */
         $privateKeyId       = [ $privateKeyString, $passPhrase ];
-        $x509Factory        = OpenSSLX509Factory::csrfactory( null, self::getDN(), $privateKeyId, self::$config );
+        $x509Factory        = OpenSSLX509Factory::csrFactory( null, self::getDN(), $privateKeyId, self::$config );
         // get x509 cert as resource
         $x509Resource       = $x509Factory->getX509Resource();
         // get x509 cert as string

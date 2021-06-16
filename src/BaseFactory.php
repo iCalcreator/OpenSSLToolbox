@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use InvalidArgumentException;
@@ -55,22 +53,24 @@ abstract class BaseFactory
 {
     /**
      * @var callable
-     * @static
      */
     public static $ERRORHANDLER = [ 'Kigkonsult\OpenSSLToolbox\PhpErrorException', 'PhpErrors2Exception' ];
 
     /**
      * Assert algorithm - matched returned
      *
-     * @param array  $algorithms
-     * @param string $algorithm
-     * @param bool   $strict     -  if false : anycase search
+     * @param array      $algorithms
+     * @param string     $algorithm
+     * @param null|bool  $strict     if false : anycase search
      * @throws InvalidArgumentException
      * @return string  - found algorithm
-     * @access protected
-     * @static
      */
-    protected static function baseAssertAlgorithm( array $algorithms, $algorithm, $strict = false ) {
+    protected static function baseAssertAlgorithm(
+        array $algorithms,
+        string $algorithm,
+        $strict = false
+    ) : string
+    {
         static $FMTERR = 'Algorithm %s is not found';
         if( in_array( $algorithm, $algorithms, true )) {
             return $algorithm;
@@ -89,20 +89,20 @@ abstract class BaseFactory
     /**
      * Return class(+method) from FQCN
      *
-     * @param $method
+     * @param string $method
      * @return string
-     * @static
      */
-    public static function getCm( $method ) {
+    public static function getCm( string $method ) : string
+    {
         static $DB = '\\';
         return substr( $method, ( strrpos( $method,  $DB ) + 1 ));
     }
 
     /**
      * @return string
-     * @static
      */
-    public static function initClassStr() {
+    public static function initClassStr() : string
+    {
         static $FMTINIT = 'INIT %s, %s';
         static $PAD     = ' -';
         return str_pad(
@@ -115,31 +115,35 @@ abstract class BaseFactory
     /**
      * Return string with (error) argument number
      *
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @return string
-     * @static
      */
-    public static function getErrArgNoText( $argIx = null ) {
+    public static function getErrArgNoText( $argIx = null ) : string
+    {
         static $FMTARG = ' (argument #%s)';
-        return ( empty( $argIx )) ? null : sprintf( $FMTARG, $argIx );
+        return ( empty( $argIx )) ? '' : sprintf( $FMTARG, $argIx );
     }
 
     /** ***********************************************************************
      *  Array properties operations; config, DN etc
+     *
+     * @param array $source
+     * @param null  $key
+     * @param null  $subKey
+     * @return array|mixed|null
      */
 
     /*
      * Return source (key(/subkey)) value, null on not found
      *
      * @param array $source
-     * @param string $key      see OpenSSLInterface constants
-     * @param string $subKey   see OpenSSLInterface constants
-     * @return array|string    null on not found
+     * @param null|string $key      see OpenSSLInterface constants
+     * @param null|string $subKey   see OpenSSLInterface constants
+     * @return null|array|string    null on not found
      * @throws InvalidArgumentException
-     * @access protected
-     * @static
      */
-    protected static function getSource( $source, $key = null, $subKey = null ) {
+    protected static function getSource( array $source, $key = null, $subKey = null )
+    {
         if( empty( $source )) {
             return null;
         }
@@ -161,15 +165,17 @@ abstract class BaseFactory
      * Return bool true if array key (/subkey) is set
      *
      * @param array $source
-     * @param string $key      see OpenSSLInterface constants
-     * @param string $subKey   see OpenSSLInterface constants
-     * @return bool            true if found
+     * @param null|string $key      see OpenSSLInterface constants
+     * @param null|string $subKey   see OpenSSLInterface constants
+     * @return bool                 true if found
      * @throws InvalidArgumentException
-     * @access protected
-     * @static
      */
-    protected static function isSourceKeySet( $source, $key = null, $subKey = null ) {
+    protected static function isSourceKeySet(
+        array $source,
+        $key = null,
+        $subKey = null
+    ) : bool
+    {
         return ( ! is_null( self::getSource( $source, $key, $subKey )));
     }
-
 }

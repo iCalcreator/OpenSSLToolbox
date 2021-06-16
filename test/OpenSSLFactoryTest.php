@@ -4,28 +4,25 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  */
 namespace Kigkonsult\OpenSSLToolbox;
 
@@ -241,7 +238,11 @@ class OpenSSLFactoryTest extends OpenSSLTest
             $encrypted = OpenSSLFactory::getEncryptedString(
                 Faker\Factory::create()->words( 3, true ),
                 OpenSSLFactory::getAvailableCipherMethods()[0],
-                OpenSSLFactory::getDigestHash( Faker\Factory::create()->words( 2, true ), 'sha256', true ),
+                OpenSSLFactory::getDigestHash(
+                    Faker\Factory::create()->words( 2, true ),
+                    'sha256',
+                    true
+                ),
                 12345
             );
         }
@@ -462,14 +463,14 @@ class OpenSSLFactoryTest extends OpenSSLTest
      *      OpenSSLFactory::getprivateKeyEncryptedString
      *      OpenSSLFactory::getpublicKeyDecryptedString
      *
-     * @param $case
-     * @param $msg
-     * @param $msg2
-     * @param $xx
-     * @param $data
-     * @param $expected
-     * @param $publicKeySource
-     * @param $privateKeySource
+     * @param mixed $case
+     * @param mixed $msg
+     * @param mixed $msg2
+     * @param mixed $xx
+     * @param mixed $data
+     * @param mixed $expected
+     * @param mixed $publicKeySource
+     * @param mixed $privateKeySource
      */
     public function OpenSSLFactoryTester3x( $case, $msg, $msg2, $xx, $data, $expected, $publicKeySource, $privateKeySource ) {
         $publicEncrypt = true;

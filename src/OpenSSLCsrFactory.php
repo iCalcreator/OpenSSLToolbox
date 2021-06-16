@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -67,7 +65,6 @@ use function sprintf;
  */
 class OpenSSLCsrFactory extends OpenSSLBaseFactory2
 {
-
     /**
      * constant
      */
@@ -75,7 +72,6 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
 
     /**
      * @var array
-     * @access private
      */
     private $dn = [];
 
@@ -85,19 +81,16 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      *                                2. fileName
      *                                3. PEM string
      *                                4. array( 2/3, passPhrase )
-     * @access private
      */
     private $privateKey = null;
 
     /**
      * @var array
-     * @access private
      */
     private $extraAttribs = [];
 
     /**
      * @var resource
-     * @access private
      */
     private $csrResource = null;
 
@@ -106,20 +99,28 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      *
      * If arguments dn and privateKey are set, a new CSR resource are created
      *
-     * @param array    $dn            The Distinguished Name or subject fields to be used in the certificate.
+     * @param null|array    $dn       The Distinguished Name or subject fields to be used in the certificate.
      *                                Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
-     * @param string|array|resource $privateKey  A private key
+     * @param null|string|array|resource $privateKey
+     *                                A private key
      *                                1. private key resource
      *                                2. ('file://')fileName
      *                                3. PEM string
      *                                4. array( 2/3, passPhrase )
-     * @param array    $configArgs    Finetuning the CSR signing
-     * @param array    $extraAttribs  Additional configuration options for the CSR
+     * @param null|array $configArgs
+     *                                Finetuning the CSR signing
+     * @param null|array    $extraAttribs  Additional configuration options for the CSR
      *                                Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function __construct( array $dn = null, $privateKey = null, $configArgs = null, $extraAttribs = null ) {
+    public function __construct(
+        $dn = null,
+        $privateKey = null,
+        $configArgs = null,
+        $extraAttribs = null
+    )
+    {
         $this->logger = LoggerDepot::getLogger( get_class() );
         $this->log( LogLevel::INFO, self::initClassStr());
         $setReady = 0;
@@ -145,22 +146,30 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     /**
      * Class factory method
      *
-     * @param array    $dn            The Distinguished Name or subject fields to be used in the certificate.
+     * @param null|array    $dn       The Distinguished Name or subject fields to be used in the certificate.
      *                                Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
-     * @param string|array|resource $privateKey  A private key
+     * @param null|string|array|resource $privateKey
+     *                                A private key
      *                                1. private key resource
      *                                2. ('file://')fileName
      *                                3. PEM string
      *                                4. array( 2/3, passPhrase )
-     * @param array    $configArgs    Finetuning the CSR signing, default config from class contruct
-     * @param array    $extraAttribs  Additional configuration options for the CSR
+     * @param null|array $configArgs
+     *                                Finetuning the CSR signing, default config from class contruct
+     * @param null|array $extraAttribs
+     *                                Additional configuration options for the CSR
      *                                Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
      * @return static
      * @throws InvalidArgumentException
      * @throws RunTimeException
-     * @access static
      */
-    public static function factory( array $dn = null, $privateKey = null, $configArgs = null, $extraAttribs = null ) {
+    public static function factory(
+        $dn = null,
+        $privateKey = null,
+        $configArgs = null,
+        $extraAttribs = null
+    ) : self
+    {
         return new self( $dn, $privateKey, $configArgs, $extraAttribs );
     }
 
@@ -168,24 +177,33 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * Generate and save a CSR resource - uses openssl_csr_new
      *
      * @link https://www.php.net/manual/en/function.openssl-csr-new.php
-     * @param array $dn            The Distinguished Name or subject fields to be used in the certificate.
+     * @param null|array $dn       The Distinguished Name or subject fields to be used in the certificate.
      *                             Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
      *                             If null, uses 'instance create'-dn, if set
-     * @param string|array|resource $privateKeyId  A private key
+     * @param null|string|array|resource $privateKeyId
+     *                             A private key
      *                             1. private key resource
      *                             2. PEM string
      *                             3. ('file://')fileName with PEM string content
      *                             4. array( 2/3, passPhrase )
      *                             If null, uses 'instance create'-privateKeyId, if set
-     * @param array $configArgs    Finetuning the CSR signing, if null, uses 'instance create'-configArgs, if set
-     * @param array $extraAttribs  Additional configuration options for the CSR
+     * @param null|array $configArgs
+     *                             Finetuning the CSR signing, if null, uses 'instance create'-configArgs, if set
+     * @param null|array $extraAttribs
+     *                             Additional configuration options for the CSR
      *                             Assoc array whose keys are converted to OIDs and applied to the relevant part of the request.
      *                             If null, uses 'instance create'-extraAttribs, if set
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function csrNew( array $dn = null, $privateKeyId = null, $configArgs = null, $extraAttribs = null ) {
+    public function csrNew(
+        $dn = null,
+        $privateKeyId = null,
+        $configArgs = null,
+        $extraAttribs = null
+    ) : self
+    {
         static $FMTERR1 = 'Argument dn (#1) is required';
         static $FMTERR2 = 'Argument privateKey (#2) is required';
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
@@ -229,11 +247,13 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      *
      * Returns extracted public key from csr and prepares it for use by other functions.
      * including fields commonName (CN), organizationName (O), countryName (C) etc.
+     *
      * @link https://www.php.net/manual/en/function.openssl-csr-get-subject.php
      * @return resource   type 'OpenSSL key'
      * @throws RuntimeException
      */
-    public function getPublicKey() {
+    public function getPublicKey()
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isCsrResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -263,7 +283,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return resource   type 'OpenSSL key'
      * @throws RuntimeException
      */
-    public function getPublicKeyAsResource() {
+    public function getPublicKeyAsResource()
+    {
         return $this->getPublicKey();
     }
 
@@ -272,24 +293,26 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      *
      * Returns subject distinguished name information encoded in the csr
      * including fields commonName (CN), organizationName (O), countryName (C) etc.
+     *
      * @link https://www.php.net/manual/en/function.openssl-csr-get-subject.php
-     * @param bool $useShortnames  Controls how the ouput data is indexed in the array,
+     * @param null|bool $useShortnames
+     *                             Controls how the ouput data is indexed in the array,
      *                             if TRUE (the default) then fields will be indexed with the short name form,
      *                             otherwise, long name forms will be used - e.g.: CN shortname form of commonName
      * @return array
      * @throws RuntimeException
      */
-    public function getSubject( $useShortnames = true ) {
+    public function getSubject( $useShortnames = true ) : array
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isCsrResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
         }
-        $useShortnames = Assert::bool( $useShortnames, 1, true );
         $result = false;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_csr_get_subject( $this->csrResource, $useShortnames );
+            $result = openssl_csr_get_subject( $this->csrResource, ( $useShortnames ?? true ));
         }
         catch( Exception $e ) {
             self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
@@ -307,13 +330,15 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     /**
      * Return the subject (DN array) of a CSR  - alias of getSubject
      *
-     * @param bool $useShortnames  Controls how the ouput data is indexed in the array,
+     * @param null|bool $useShortnames
+     *                             Controls how the ouput data is indexed in the array,
      *                             if TRUE (the default) then fields will be indexed with the short name form,
      *                             otherwise, long name forms will be used - e.g.: CN shortname form of commonName
      * @return array
      * @throws RuntimeException
      */
-    public function getDNfromCsrResource( $useShortnames = true ) {
+    public function getDNfromCsrResource( $useShortnames = true ) : array
+    {
         return $this->getSubject( $useShortnames );
     }
 
@@ -321,12 +346,14 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * Return (exports) a CSR as a string in PEM format - uses openssl_csr_export
      *
      * @link https://www.php.net/manual/en/function.openssl-csr-export.php
-     * @param bool   $noText    Optional, affects the verbosity of the output;
+     * @param null|bool $noText
+     *                          Optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return string
      * @throws RuntimeException
      */
-    public function export( $noText = true ) {
+    public function export( $noText = true ) : string
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isCsrResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -355,12 +382,14 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     /**
      * Return (exports) a CSR as a string in PEM format - alias of export
      *
-     * @param bool   $noText    Optional, affects the verbosity of the output;
+     * @param null|bool $noText
+     *                          Optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return string  PEM format
      * @throws RuntimeException
      */
-    public function getCSRasPemString( $noText = true ) {
+    public function getCSRasPemString( $noText = true ) : string
+    {
         return $this->export( $noText );
     }
 
@@ -370,7 +399,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return string  DER format
      * @throws RuntimeException
      */
-    public function getCSRasDerString() {
+    public function getCSRasDerString() : string
+    {
         return self::pem2Der( $this->export( true ));
     }
 
@@ -378,15 +408,18 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * Save an Certificate Signing Request into a PEM file - uses openssl_csr_export_to_file
      *
      * Export the Certificate Signing Request represented by csr and saves it in PEM format into file
+     *
      * @link https://www.php.net/manual/en/function.openssl-csr-export-to-file.php
      * @param string $fileName  Path to the output file.
-     * @param bool   $noText    Optional, affects the verbosity of the output;
+     * @param null|bool $noText
+     *                          Optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function exportToFile( $fileName, $noText = true ) {
+    public function exportToFile( string $fileName, $noText = true ) : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isCsrResourceSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -417,13 +450,15 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * Save an Certificate Signing Request into a Pem file - alias of exportToFile
      *
      * @param string $fileName  Path to the output file.
-     * @param bool   $noText    Optional, affects the verbosity of the output;
+     * @param null|bool $noText
+     *                          Optional, affects the verbosity of the output;
      *                          if it is FALSE, then additional human-readable information is included in the output.
      * @return static
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function saveCSRcertIntoPemFile( $fileName, $noText = true ) {
+    public function saveCSRcertIntoPemFile( string $fileName, $noText = true ) : self
+    {
         return $this->exportToFile( $fileName, $noText );
     }
 
@@ -435,7 +470,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function saveCSRcertIntoDerFile( $fileName ) {
+    public function saveCSRcertIntoDerFile( string $fileName ) : self
+    {
         Assert::fileNameWrite( $fileName );
         Workshop::saveDataToFile( $fileName, self::pem2Der( $this->export( true )));
         return $this;
@@ -445,28 +481,38 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * Return an x509 certificate resource  - uses openssl_csr_sign
      *
      * Sign a CSR with another certificate (or itself) and generate a certificate
+     *
      * @link https://www.php.net/manual/en/function.openssl-csr-sign.php
-     * @param resource|string $caCert   The generated certificate will be signed by caCert.
+     * @param null|resource|string $caCert
+     *                           The generated certificate will be signed by caCert.
      *                           If caCert is NULL, the generated certificate will be a self-signed certificate.
      *                           1. An X.509 resource returned from openssl_x509_read()
      *                           2. A string having the format (file://)path/to/cert.pem;
      *                              the named file must contain a (single) PEM encoded certificate
      *                           3. A string containing the content of a (single) PEM encoded certificate
-     * @param string|resource $privateKeyId
+     * @param null|string|resource $privateKeyId
      *                           The private key that corresponds to caCert, PEM string or resource
      *                           1. private key resource
      *                           2. fileName, content string PEM string
      *                           3. string PEM string
      *                           4. array( 2/3, passPhrase )
-     * @param int   $days        Length of time for which the generated certificate will be valid, in days (default 365).
-     * @param array $configArgs  Finetuning the CSR signing, default config from class contruct
+     * @param null|int   $days   Length of time for which the generated certificate will be valid, in days (default 365).
+     * @param null|array $configArgs
+     *                           Finetuning the CSR signing, default config from class contruct
      *                           If null, uses 'instance create'-configArgs, if set
-     * @param int   $serial      Optional the serial number of issued certificate (default 0)
+     * @param null|int   $serial Optional the serial number of issued certificate (default 0)
      * @return resource
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function sign( $caCert, $privateKeyId = null, $days = 365, $configArgs = null, $serial = 0 ) {
+    public function sign(
+        $caCert = null,
+        $privateKeyId = null,
+        $days = 365,
+        $configArgs = null,
+        $serial = 0
+    )
+    {
         static $PRIVATEKEY = 'privateKey';
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isCsrResourceSet()) {
@@ -502,25 +548,35 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     /**
      * Return an x509 certificate resource  - alias of sign
      *
-     * @param resource|string $caCert  The generated certificate will be signed by caCert.
-     *                           If caCert is NULL, the generated certificate will be a self-signed certificate.
-     *                           1. An X.509 resource returned from openssl_x509_read()
-     *                           2. A string having the format (file://)path/to/cert.pem;
-     *                              the named file must contain a (single) PEM encoded certificate
-     *                           3. A string containing the content of a (single) PEM encoded certificate
-     * @param string|array|resource $privateKeyId  A private key
-     *                           1. private key resource
-     *                           2. ('file://'+)fileName
-     *                           3. PEM string
-     *                           4. array( 2/3, passPhrase )
-     * @param int   $days        Length of time for which the generated certificate will be valid, in days (default 365).
-     * @param array $configArgs  Finetuning the CSR signing, default config from class contruct, if set
-     * @param int   $serial      Optional the serial number of issued certificate (default 0)
+     * @param null|resource|string $caCert
+     *                            The generated certificate will be signed by caCert.
+     *                            If caCert is NULL, the generated certificate will be a self-signed certificate.
+     *                            1. An X.509 resource returned from openssl_x509_read()
+     *                            2. A string having the format (file://)path/to/cert.pem;
+     *                               the named file must contain a (single) PEM encoded certificate
+     *                            3. A string containing the content of a (single) PEM encoded certificate
+     * @param null|string|array|resource $privateKeyId
+     *                            A private key
+     *                            1. private key resource
+     *                            2. ('file://'+)fileName
+     *                            3. PEM string
+     *                            4. array( 2/3, passPhrase )
+     * @param null|int   $days    Length of time for which the generated certificate will be valid, in days (default 365).
+     * @param null|array $configArgs
+     *                            Finetuning the CSR signing, default config from class contruct, if set
+     * @param null|int   $serial  Optional the serial number of issued certificate (default 0)
      * @return resource
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getX509CertResource( $caCert, $privateKeyId = null, $days = 365, $configArgs = null, $serial = 0 ) {
+    public function getX509CertResource(
+        $caCert = null,
+        $privateKeyId = null,
+        $days = 365,
+        $configArgs = null,
+        $serial = 0
+    )
+    {
         return $this->sign( $caCert, $privateKeyId, $days, $configArgs, $serial );
     }
 
@@ -533,25 +589,27 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      *
      * @param string|resource $csrResource
      * @return bool
-     * @static
      */
-    public static function isValidCsrResource( $csrResource ) {
+    public static function isValidCsrResource( $csrResource ) : bool
+    {
         return parent::isValidResource( $csrResource, self::CSRRESOURCETYPE );
     }
 
     /**
-     * @param string $key    see OpenSSLInterface constants
-     * @return string|array  null if key is not found
+     * @param null|string $key    see OpenSSLInterface constants
+     * @return null|string|array  null if key is not found
      */
-    public function getDn( $key = null ) {
+    public function getDn( $key = null )
+    {
         return parent::getSource( $this->dn, $key );
     }
 
     /**
-     * @param string $key    see OpenSSLInterface constants
-     * @return bool          true if DN (key) is set
+     * @param null|string $key    see OpenSSLInterface constants
+     * @return bool               true if DN (key) is set
      */
-    public function isDnSet( $key = null ) {
+    public function isDnSet( $key = null ) : bool
+    {
         return parent::isSourceKeySet( $this->dn, $key );
     }
 
@@ -561,7 +619,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return static
      * @throws InvalidArgumentException
      */
-    public function addDn( $key, $value ) {
+    public function addDn( string $key, $value ) : self
+    {
         Assert::string( $key );
         $this->dn[$key] = $value;
         return $this;
@@ -571,7 +630,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @param array $dn
      * @return static
      */
-    public function setDn( array $dn ) {
+    public function setDn( array $dn ) : self
+    {
         foreach( $dn as $key => $value ) {
             $this->addDn( $key, $value );
         }
@@ -579,11 +639,12 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     }
 
     /**
-     * @param resource|string|array $privateKeyId
-     * @param int|string $argIx
+     * @param null|resource|string|array $privateKeyId
+     * @param null|int|string $argIx
      * @return string|resource
      */
-    public function getPrivateKey( $privateKeyId = null, $argIx = null ) {
+    public function getPrivateKey( $privateKeyId = null, $argIx = null )
+    {
         if( empty( $privateKeyId )) {
             return $this->privateKey;
         }
@@ -593,7 +654,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     /**
      * @return bool
      */
-    public function isPrivateKeySet() {
+    public function isPrivateKeySet() : bool
+    {
         return ( ! empty( $this->privateKey ));
     }
 
@@ -602,7 +664,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setPrivateKey( $privateKey ) {
+    public function setPrivateKey( $privateKey ) : self
+    {
         $this->privateKey = OpenSSLPkeyFactory::assertPkey( $privateKey );
         return $this;
     }
@@ -613,17 +676,19 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return static
      * @throws InvalidArgumentException
      */
-    public function addExtraAttribs( $key, $value ) {
+    public function addExtraAttribs( string $key, $value ) : self
+    {
         Assert::string( $key );
         $this->extraAttribs[$key] = $value;
         return $this;
     }
 
     /**
-     * @param string|array $keyAttrs
-     * @return string|array   null if (key is) not found
+     * @param null|string|array $keyAttrs
+     * @return null|string|array   null if (key is) not found
      */
-    public function getExtraAttribs( $keyAttrs = null ) {
+    public function getExtraAttribs( $keyAttrs = null )
+    {
         if( ! empty( $keyAttrs ) && is_array( $keyAttrs )) {
             return $keyAttrs;
         }
@@ -631,10 +696,11 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     }
 
     /**
-     * @param string $key
+     * @param null|string $key
      * @return bool
      */
-    public function isExtraAttribsSet( $key = null ) {
+    public function isExtraAttribsSet( $key = null ) : bool
+    {
         return parent::isSourceKeySet( $this->extraAttribs, $key );
     }
 
@@ -643,7 +709,8 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setExtraAttribs( array $extraAttribs ) {
+    public function setExtraAttribs( array $extraAttribs ) : self
+    {
         foreach( $extraAttribs as $key => $value ) {
             $this->addExtraAttribs( $key, $value );
         }
@@ -653,19 +720,25 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
     /**
      * @return resource
      */
-    public function getCsrResource() {
+    public function getCsrResource()
+    {
         return $this->csrResource;
     }
 
     /**
      * @return bool
      */
-    public function isCsrResourceSet() {
+    public function isCsrResourceSet() : bool
+    {
         if( empty( $this->csrResource )) {
             return false;
         }
         if( ! self::isValidCsrResource( $this->csrResource )) {
-            $msg = self::getErrRscMsg( __METHOD__, self::CSRRESOURCETYPE, $this->csrResource );
+            $msg = self::getErrRscMsg(
+                __METHOD__,
+                self::CSRRESOURCETYPE,
+                $this->csrResource
+            );
             $this->log( LogLevel::WARNING, $msg );
             return false;
         }
@@ -677,9 +750,14 @@ class OpenSSLCsrFactory extends OpenSSLBaseFactory2
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setCsrResource( $csrResource ) {
+    public function setCsrResource( $csrResource ) : self
+    {
         if( ! self::isValidCsrResource( $csrResource )) {
-            $msg = self::getErrRscMsg( __METHOD__, self::CSRRESOURCETYPE, $csrResource );
+            $msg = self::getErrRscMsg(
+                __METHOD__,
+                self::CSRRESOURCETYPE,
+                $csrResource
+            );
             $this->log( LogLevel::ERROR,  $msg );
             throw new InvalidArgumentException( $msg );
         }

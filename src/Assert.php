@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use InvalidArgumentException;
@@ -49,7 +47,6 @@ use function dirname;
 use function is_dir;
 use function is_file;
 use function var_export;
-use function is_null;
 use function is_resource;
 use function is_writeable;
 use function sprintf;
@@ -59,11 +56,8 @@ use function sprintf;
  */
 class Assert
 {
-
     /**
      * $var string
-     * @access private
-     * @static
      */
     private static $FMT4  = 'Resource not stream';
 
@@ -71,14 +65,17 @@ class Assert
      * Assert data is a boolean and return bool, accepts true/false/1/0
      *
      * @param mixed $data
-     * @param int|string $argIx
-     * @param bool $valueIfNull
+     * @param null|int|string $argIx
+     * @param null|bool $valueIfNull
      * @return bool
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function bool( $data, $argIx = null, $valueIfNull = null ) {
+    public static function bool( $data, $argIx = null, $valueIfNull = null ) : bool
+    {
         static $FMT2 = 'bool expected%s, got \'%s\'';
+        if( null === $data ) {
+            $data = $valueIfNull;
+        }
         switch( true ) {
             case is_bool( $data ) :
                 break;
@@ -88,15 +85,11 @@ class Assert
             case ( 0 === $data ) :
                 $data = false;
                 break;
-            case ( is_null( $data )) :
-                $data = $valueIfNull;
-                break;
             default :
                 throw new InvalidArgumentException(
                     sprintf( $FMT2, BaseFactory::getErrArgNoText( $argIx ), var_export( $data, true ))
                 );
-                break;
-        }
+        } // end switch
         return $data;
     }
 
@@ -104,16 +97,16 @@ class Assert
      * Assert data is an positiv integer (scalar) and return int
      *
      * @param mixed $data
-     * @param int|string $argIx
-     * @param int $valueIfNull
+     * @param null|int|string $argIx
+     * @param null|int $valueIfNull
      * @return int
-     * @static
-     *@throws InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function int( $data, $argIx = null, $valueIfNull = null ) {
+    public static function int( $data, $argIx = null, $valueIfNull = null ) : int
+    {
         static $FMT2 = 'Int expected%s, got \'%s\'';
-        if( is_null( $data )) {
-            return $valueIfNull;
+        if( null === $data ) {
+            $data = $valueIfNull;
         }
         if( ! ctype_digit( (string) $data ) || ( 0 > $data )) {
             throw new InvalidArgumentException(
@@ -127,16 +120,16 @@ class Assert
      * Assert data is a string (i.e. is a scalar) and return string
      *
      * @param mixed      $data
-     * @param int|string $argIx
-     * @param string     $valueIfNull
+     * @param null|int|string $argIx
+     * @param null|string     $valueIfNull
      * @return string
-     * @static
-     *@throws InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function string( $data, $argIx = null, $valueIfNull = null ) {
+    public static function string( $data, $argIx = null, $valueIfNull = null ) : string
+    {
         static $FMT2 = 'String expected%s, got \'%s\'';
-        if( is_null( $data )) {
-            return $valueIfNull;
+        if( null === $data ) {
+            $data = $valueIfNull;
         }
         if( ! is_scalar( $data )) {
             throw new InvalidArgumentException(
@@ -150,26 +143,23 @@ class Assert
      * Assert (path/)fileName is a (local) file or file resource
      *
      * @param string|resource $fileName
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @static
-     * @todo traverse pathinfo until existing path is found...
      */
-    public static function fileName( $fileName, $argIx = null ) {
+    public static function fileName( $fileName, $argIx = null )
+    {
         static $FMT1 = '%s is no file';
         switch( true ) {
             case ( ! is_resource( $fileName )) :
                 break;
             case ( ! Workshop::isFileResource( $fileName )) :
                 throw new InvalidArgumentException( self::$FMT4 . BaseFactory::getErrArgNoText( $argIx ));
-                break;
             default :
                 return;
-                break;
         } // end switch
         self::string( $fileName, $argIx );
         switch( true ) {
-            case  @is_file( $fileName ) : // but may not yet exist...
+            case @is_file( $fileName ) :
                 break;
             case  @is_dir( dirname( $fileName )) :
                 break;
@@ -177,19 +167,19 @@ class Assert
                 throw new InvalidArgumentException(
                     sprintf( $FMT1, $fileName ) . BaseFactory::getErrArgNoText( $argIx )
                 );
-                break;
         }
-        clearstatcache( $fileName );
+        clearstatcache( true, $fileName );
     }
 
     /**
      * Assert (path/)fileName is a readable (local) file (resource)
      *
      * @param string|resource $fileName
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
      */
-    public static function fileNameRead( $fileName, $argIx = null ) {
+    public static function fileNameRead( $fileName, $argIx = null )
+    {
         static $FMT2 = 'Resource (type %s) is not readable';
         static $FMT7 = 'File expected, got directory %s';
         static $FMT8 = 'File %s is not readable';
@@ -198,15 +188,12 @@ class Assert
                 break;
             case ( ! Workshop::isFileResource( $fileName )) :
                 throw new InvalidArgumentException( self::$FMT4 . BaseFactory::getErrArgNoText( $argIx ));
-                break;
             case Workshop::isResourceReadable( $fileName ) :
                 return;
-                break;
             default;
                 throw new InvalidArgumentException(
                     sprintf( $FMT2, Workshop::getResourceType( $fileName ) . BaseFactory::getErrArgNoText( $argIx ))
                 );
-                break;
         } // end if
         self::string( $fileName, $argIx );
         $fileName = Workshop::getFileWithoutProtoPrefix( $fileName );
@@ -215,14 +202,12 @@ class Assert
                 throw new InvalidArgumentException(
                     sprintf( $FMT7, $fileName ). BaseFactory::getErrArgNoText( $argIx )
                 );
-                break;
             case @is_readable( $fileName ) :
                 break;
             default :
                 throw new InvalidArgumentException(
                     sprintf( $FMT8, $fileName ). BaseFactory::getErrArgNoText( $argIx )
                 );
-                break;
         }
         clearstatcache( true, $fileName );
     }
@@ -231,11 +216,12 @@ class Assert
      * Assert (path/)fileName is a writable (local) file (resource)
      *
      * @param string|resource $fileName
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
      * @todo check path top level and down, file may not yet exist
      */
-    public static function fileNameWrite( $fileName, $argIx = null ) {
+    public static function fileNameWrite( $fileName, $argIx = null )
+    {
         static $FMT1 = 'Resource not readable';
         static $FMT2 = 'file %s is not writeable';
         switch( true ) {
@@ -243,13 +229,10 @@ class Assert
                 break;
             case ( ! Workshop::isFileResource( $fileName )) :
                 throw new InvalidArgumentException( self::$FMT4 . BaseFactory::getErrArgNoText( $argIx ));
-                break;
             case ( ! Workshop::isResourceWritable( $fileName )) :
                 throw new InvalidArgumentException( $FMT1 . BaseFactory::getErrArgNoText( $argIx ));
-                break;
             default :
                 return;
-                break;
         } // end switch
         self::string( $fileName, $argIx );
         $fileName = Workshop::getFileWithoutProtoPrefix( $fileName );
@@ -258,7 +241,6 @@ class Assert
                 sprintf( $FMT2, $fileName ) . BaseFactory::getErrArgNoText( $argIx )
             );
         }
-        clearstatcache( $fileName );
+        clearstatcache( true, $fileName );
     }
-
 }

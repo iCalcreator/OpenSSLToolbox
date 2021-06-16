@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use function base64_decode;
@@ -54,6 +52,7 @@ use function preg_match;
 use function rtrim;
 use function str_repeat;
 use function strlen;
+use function strtoupper;
 use function strtr;
 use function substr;
 
@@ -69,21 +68,16 @@ class Convert extends BaseFactory
     /**
      * @var int
      *         sufficiently small modulo 4 natural
-     * @static
      */
     private static $DIVISOR = 256;
 
     /**
      * @var string
-     * @access private
-     * @static
      */
     private static $EQ   = '=';
 
     /**
      * @var string
-     * @access private
-     * @static
      */
     private static $MU = '-_';
     private static $PS = '+/';
@@ -93,10 +87,10 @@ class Convert extends BaseFactory
      *
      * @param string $data
      * @return bool
-     * @static
      * @link http://php.net/manual/en/function.base64-decode.php#81425
      */
-    public static function isBase64( $data ) {
+    public static function isBase64( string $data ) : bool
+    {
         static $PATTERN = '%^[a-zA-Z0-9/+]*={0,2}$%';
         return ( 1 == preg_match($PATTERN, $data ));
     }
@@ -106,9 +100,9 @@ class Convert extends BaseFactory
      *
      * @param string $raw
      * @return string
-     * @static
      */
-    public static function base64Encode( $raw ) {
+    public static function base64Encode( string $raw ) : string
+    {
         $data = Assert::string( $raw );
         return base64_encode( $data );
     }
@@ -118,10 +112,10 @@ class Convert extends BaseFactory
      *
      * @param string $encoded
      * @return string
-     * @static
      * @link https://www.php.net/manual/en/function.base64-decode.php#92980
      */
-    public static function base64Decode( $encoded ) {
+    public static function base64Decode( string $encoded ) : string
+    {
         $decoded      = '';
         $chunksLength = ceil( strlen( $encoded ) / self::$DIVISOR );
         for( $i = 0; $i < $chunksLength; $i++ ) {
@@ -134,10 +128,10 @@ class Convert extends BaseFactory
      *
      * @param string $raw
      * @return string
-     * @static
      * @link https://www.php.net/manual/en/function.base64-encode.php#121767
      */
-    public static function base64UrlEncode( $raw ) {
+    public static function base64UrlEncode( string $raw ) : string
+    {
         $data = Assert::string( $raw );
         return rtrim( strtr( base64_encode( $data ), self::$PS, self::$MU ), self::$EQ );
     }
@@ -147,10 +141,10 @@ class Convert extends BaseFactory
      *
      * @param string $encoded
      * @return string
-     * @static
      * @link https://www.php.net/manual/en/function.base64-encode.php#121767
      */
-    public static function base64UrlDecode( $encoded ) {
+    public static function base64UrlDecode( string $encoded ) : string
+    {
         $multiplier = 3 - ( 3 + strlen( $encoded ) ) % 4;
         return base64_decode( strtr( $encoded, self::$MU, self::$PS ) . str_repeat( self::$EQ, $multiplier ) );
     }
@@ -166,7 +160,8 @@ class Convert extends BaseFactory
      * @return bool
      * @link https://stackoverflow.com/questions/2643157/php-simple-validate-if-string-is-hex
      */
-    public static function isHex( $string ) {
+    public static function isHex( string $string ) : bool
+    {
         static $PATTERN = "/^[a-f0-9]{2,}$/i";
         return ( is_string( $string ) &&
             ( 1 == @preg_match( $PATTERN, $string ) ) &&
@@ -179,12 +174,11 @@ class Convert extends BaseFactory
      *
      * @param string $string
      * @return string
-     * @static
      * @link https://stackoverflow.com/questions/14674834/php-convert-string-to-hex-and-hex-to-string
      */
-    public static function strToHex( $string ) {
+    public static function strToHex( string $string ) : string
+    {
         static $ZERO = '0';
-        $string = (string) $string;
         $strlen = strlen( $string );
         $hex    = '';
         for( $i = 0; $i < $strlen; $i++ ) {
@@ -192,7 +186,7 @@ class Convert extends BaseFactory
             $hexCode = dechex( $ord );
             $hex     .= substr( $ZERO . $hexCode, -2 );
         }
-        return strToUpper( $hex );
+        return strtoupper( $hex );
     }
 
     /**
@@ -200,10 +194,10 @@ class Convert extends BaseFactory
      *
      * @param string $hex
      * @return string
-     * @static
      * @link https://stackoverflow.com/questions/14674834/php-convert-string-to-hex-and-hex-to-string
      */
-    public static function hexToStr( $hex ) {
+    public static function hexToStr( string $hex ) : string
+    {
         $strlen = strlen( $hex ) - 1;
         $string = '';
         for( $i = 0; $i < $strlen; $i += 2 ) {
@@ -223,10 +217,10 @@ class Convert extends BaseFactory
      *
      * @param mixed $input
      * @return string
-     * @static
      * @link https://www.php.net/manual/en/function.pack.php
      */
-    public static function Hpack( $input ) {
+    public static function Hpack( $input ) : string
+    {
         return pack( self::$HAST, $input );
     }
 
@@ -235,10 +229,10 @@ class Convert extends BaseFactory
      *
      * @param string $binaryData
      * @return mixed
-     * @static
      * @link https://www.php.net/manual/en/function.unpack.php
      */
-    public static function HunPack( $binaryData ) {
+    public static function HunPack( string $binaryData )
+    {
         return unpack( self::$HAST, $binaryData )[1];
     }
 }

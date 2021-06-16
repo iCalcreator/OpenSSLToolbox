@@ -4,24 +4,22 @@
 
  This file is a part of OpenSSLToolbox.
 
- Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- author    Kjell-Inge Gustafsson, kigkonsult
- Link      https://kigkonsult.se
- Version   0.971
- License   Subject matter of licence is the software OpenSSLToolbox.
-           The above copyright, link, package and version notices,
-           this licence notice shall be included in all copies or substantial
-           portions of the OpenSSLToolbox.
+ author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ link      https://kigkonsult.se
+ license   Subject matter of licence is the software Asit. The above
+           copyright, link, package and version notices, this licence notice shall be
+           included in all copies or substantial portions of the OpenSSLToolbox.
 
-           OpenSSLToolbox is free software: you can redistribute it and/or modify
-           it under the terms of the GNU Lesser General Public License as published
-           by the Free Software Foundation, either version 3 of the License,
-           or (at your option) any later version.
+           OpenSSLToolbox is free software: you can redistribute it and/or modify it
+           under the terms of the GNU Lesser General Public License as published by
+           the Free Software Foundation, either version 3 of the License, or (at your
+           option) any later version.
 
-           OpenSSLToolbox is distributed in the hope that it will be useful,
-           but WITHOUT ANY WARRANTY; without even the implied warranty of
-           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-           GNU Lesser General Public License for more details.
+           OpenSSLToolbox is distributed in the hope that it will be useful, but
+           WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+           or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+           License for more details.
 
            You should have received a copy of the GNU Lesser General Public License
            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
@@ -37,8 +35,43 @@
          bootstrap="autoload.php"
         >
     <testsuites>
-        <testsuite name="all in one">
-            <directory>test</directory>
+        <testsuite name="base">
+            <file>test/AssertTest.php</file>
+            <file>test/BaseFactoryTest.php</file>
+            <file>test/ConvertTest.php</file>
+        </testsuite>
+        <testsuite name="demo">
+            <file>test/OpenSSLDemoTest.php</file>
+        </testsuite>
+        <testsuite name="addOn">
+            <file>test/WorkshopTest.php</file>
+            <file>test/PhpErrorExceptionTest.php</file>
+        </testsuite>
+        <testsuite name="hash">
+            <file>test/HashFactoryTest.php</file>
+            <file>test/HmacHashFactoryTest.php</file>
+        </testsuite>
+        <testsuite name="OpenSLL base">
+            <file>test/OpenSSLBaseFactoryTest.php</file>
+            <file>test/OpenSSLBaseFactory2Test.php</file>
+        </testsuite>
+        <testsuite name="OpenSLL deep factory">
+            <file>test/OpenSSLFactoryTest.php</file>
+        </testsuite>
+        <testsuite name="cryptor">
+            <file>test/OpenSSLCryptorTest.php</file>
+        </testsuite>
+        <testsuite name="OpenSLL Pkey+Csr">
+            <file>test/OpenSSLPkeyFactoryTest.php</file>
+            <file>test/OpenSSLCsrFactoryTest.php</file>
+        </testsuite>
+        <testsuite name="OpenSLL Pkcs 7/12">
+            <file>test/OpenSSLPkcs7FactoryTest.php</file>
+            <file>test/OpenSSLPkcs12FactoryTest.php</file>
+        </testsuite>
+        <testsuite name="OpenSLL Spki/X509">
+            <file>test/OpenSSLSpkiFactoryTest.php</file>
+            <file>test/OpenSSLX509FactoryTest.php</file>
         </testsuite>
     </testsuites>
     <filter>

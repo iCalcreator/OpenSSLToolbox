@@ -4,28 +4,25 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  */
 namespace Kigkonsult\OpenSSLToolbox;
 
@@ -198,7 +195,7 @@ class OpenSSLX509FactoryTest extends OpenSSLTest
         foreach( $cases as $x => $x509Type ) {
             $privateKey = OpenSSLPkeyFactory::factory( self::$config )->getPrivateKeyAsPemString();
             // Generate a self-signed certificate signing request CSR
-            $x509Factory0 = OpenSSLX509Factory::csrfactory( null, self::getDN(), $privateKey, self::$config );
+            $x509Factory0 = OpenSSLX509Factory::csrFactory( null, self::getDN(), $privateKey, self::$config );
 
             switch( $x ) {
                 case 0 :
@@ -217,7 +214,7 @@ class OpenSSLX509FactoryTest extends OpenSSLTest
             }
             $case = 120 + $x;
             // Generate a NEW semi-signed certificate resource (based on $x509source, above)
-            $x509Factory1 = OpenSSLX509Factory::csrfactory( $x509source, self::getDN(), $privateKey, self::$config );
+            $x509Factory1 = OpenSSLX509Factory::csrFactory( $x509source, self::getDN(), $privateKey, self::$config );
             $this->assertTrue(
                 ( OpenSSLX509Factory::X509RESOURCETYPE ==
                     get_resource_type( $x509Factory1->getX509Resource() )
@@ -242,7 +239,7 @@ class OpenSSLX509FactoryTest extends OpenSSLTest
     public function csrFactoryTest13() {
         $privateKey = OpenSSLPkeyFactory::factory( self::$config )->getPrivateKeyAsPemString();
         // Generate a self-signed certificate signing request CSR
-        $x509Factory0 = OpenSSLX509Factory::csrfactory( null, self::getDN(), $privateKey, self::$config );
+        $x509Factory0 = OpenSSLX509Factory::csrFactory( null, self::getDN(), $privateKey, self::$config );
 
         $x509Resource   = $x509Factory0->getX509Resource();
         $x509CertString = $x509Factory0->getX509CertAsPemString();
@@ -471,7 +468,7 @@ class OpenSSLX509FactoryTest extends OpenSSLTest
         $logger->log(LogLevel::INFO, OpenSSLX509Factory::getCm( __METHOD__ ) . ' Start #' . $case );
         list( $x509String, $privateKeyString ) = self::getX509CertAndprivateKey();
         $x509   = new OpenSSLX509Factory();
-        $x509->setx509certData( $x509String );
+        $x509->setX509certData( $x509String );
         $x509->read();
         $this->assertTrue(
             is_resource( $x509->getX509Resource()),

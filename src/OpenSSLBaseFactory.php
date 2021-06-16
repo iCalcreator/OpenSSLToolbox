@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -55,7 +53,6 @@ use function dechex;
 use function get_called_class;
 use function implode;
 use function in_array;
-use function is_null;
 use function is_resource;
 use function is_string;
 use function openssl_error_string;
@@ -65,7 +62,6 @@ use function preg_match;
 use function str_replace;
 use function str_pad;
 use function strlen;
-use function trim;
 
 /**
  * Class OpenSSLBaseFactory - OpenSSL* shared methods: Pem/Der, asserts etc
@@ -80,10 +76,8 @@ use function trim;
  */
 abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterface
 {
-
     /**
      * @var string
-     * @access protected
      */
     protected static $DASHBEGIN         = '-----BEGIN ';
     protected static $FMTERR1           = 'OpenSLL %s %s (#%d), %s';
@@ -95,7 +89,6 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
 
     /**
      * @var array  (values as keys)
-     * @static
      */
     public static $PEMTYPES = [
         self::PEM_X509_OLD     => 'X509 CERTIFICATE',
@@ -128,7 +121,6 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
     /**
      * @var array  (values as keys)
      * @link https://www.php.net/manual/en/openssl.signature-algos.php
-     * @static
      */
     public static $SIGNATUREALGOS = [
          5 => OPENSSL_ALGO_DSS1,
@@ -149,7 +141,6 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
     /**
      * @var array  (values as keys)
      * @link https://www.php.net/manual/en/openssl.ciphers.php
-     * @static
      */
     public static $CIPHERS = [
         0 => OPENSSL_CIPHER_RC2_40,  // Used as default cipher algorithm by
@@ -167,12 +158,12 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * Assert PEM string
      *
      * @param string $pem
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertPemString( $pem, $argIx = null ) {
-        static $FMTERR  = 'Invalid PEM format found';
+    public static function assertPemString( string $pem, $argIx = null )
+    {
+        static $FMTERR  = 'Invalid PEM format found ';
         if( ! self::isPemString( $pem )) {
             throw new InvalidArgumentException( $FMTERR . self::getErrArgNoText( $argIx ));
         }
@@ -183,22 +174,22 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      *
      * NO file read tests
      * @param string $file
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertPemFile( $file, $argIx = null ) {
+    public static function assertPemFile( string $file, $argIx = null )
+    {
         self::assertPemString( Workshop::getFileContent( $file ), $argIx );
     }
 
     /**
      * Return bool true if type is a PEM type
      *
-     * @param $type
+     * @param string $type
      * @return bool   true on success
-     * @static
      */
-    public static function isPemType( $type ) {
+    public static function isPemType( string $type ) : bool
+    {
         return in_array( $type, self::$PEMTYPES );
     }
 
@@ -206,12 +197,12 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * Assert PEM type
      *
      * @param string $type
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertPemType( $type, $argIx = null ) {
-        static $FMTERRPEM  = 'PEM type %s is invalid';
+    public static function assertPemType( string $type, $argIx = null )
+    {
+        static $FMTERRPEM  = 'PEM type %s is invalid ';
         if( ! self::isPemType( $type )) {
             throw new InvalidArgumentException( sprintf( $FMTERRPEM, $type ) . self::getErrArgNoText( $argIx ));
         }
@@ -219,7 +210,6 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
 
     /**
      * @var string
-     * @static
      */
     protected static $PEMPATTERN = '~^-----BEGIN ([A-Z ]+)-----\s*?([A-Za-z0-9+=/\r\n]+)\s*?-----END \1-----\s*$~D';
     public    static $PEMEOL = "\r\n";
@@ -230,9 +220,9 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string $pem
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getStringPemType( $pem ) {
+    public static function getStringPemType( string $pem ) : string
+    {
         self::assertPemString( $pem );
         @preg_match( self::$PEMPATTERN, $pem, $matches );
         return $matches[1];
@@ -244,9 +234,9 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string $file
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getFilePemType( $file ) {
+    public static function getFilePemType( string $file ) : string
+    {
         self::assertPemFile( $file );
         @preg_match( self::$PEMPATTERN, Workshop::getFileContent( $file ), $matches );
         return $matches[1];
@@ -255,18 +245,21 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
     /**
      * Return bool true if pem is a (single) PEM string
      *
-     * @link https://www.php.net/manual/en/function.openssl-pkey-export.php#95847
      * A standard PEM has a begin line, an end line
      * and inbetween is a base64 encoding of the DER representation of the certificate.
      * PEM requires that linefeeds ("\r\n") be present every 64 characters.
-     * @param string $pem
+     *
+     * @link https://www.php.net/manual/en/function.openssl-pkey-export.php#95847
+     * @param mixed $pem
      * @param string $type  contains PEM type (see OpenSSLInterface) on success
      * @return bool
-     * @static
      */
-    public static function isPemString( $pem, & $type = null ) {
-        if( ! is_string( $pem ) ||
-            ( 1 != @preg_match( self::$PEMPATTERN, $pem, $matches )) ||
+    public static function isPemString( $pem, & $type = null ) : bool
+    {
+        if( ! is_string( $pem )) {
+            return false;
+        }
+        if(( 1 != @preg_match( self::$PEMPATTERN, $pem, $matches )) ||
             ( 3 != count( $matches )) ||
             ( $pem !== $matches[0] ) ||
             ! self::isPemType( $matches[1] )) {
@@ -283,13 +276,13 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * A standard PEM has a begin line, an end line
      * and inbetween is a base64 encoding of the DER representation of the certificate.
      * PEM requires that linefeeds ("\r\n") be present every 64 characters.
+     *
      * @param string $file
-     * @param string $type  contains PEM type (see OpenSSLInterface) on success
      * @return bool
-     * @static
      */
-    public static function isPemFile( $file, & $type = null ) {
-        return self::isPemString( Workshop::getFileContent( $file, $type ));
+    public static function isPemFile( string $file ) : bool
+    {
+        return self::isPemString( Workshop::getFileContent( $file ));
     }
 
     /**
@@ -301,17 +294,19 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @return string
      * @throws InvalidArgumentException
      */
-    public static function pem2Der( $pem, & $type = null ) {
-        $EOLCHARS = [ "\r", "\n" ];
+    public static function pem2Der( string $pem, & $type = null ) : string
+    {
+        static $EOLCHARS = [ "\r", "\n" ];
+        static $SP0      = '';
         self::assertPemString( $pem );
         @preg_match( self::$PEMPATTERN, $pem, $matches );
         $type    = $matches[1];
-        $pemData = str_replace( $EOLCHARS, null, $matches[2] );
+        $pemData = str_replace( $EOLCHARS, $SP0, $matches[2] );
         return Convert::base64Decode( $pemData );
     }
 
     /**
-     * Convert (single) PEM filo into DER format file
+     * Convert (single) PEM fil into DER format file
      *
      * @link https://www.php.net/manual/en/function.openssl-pkey-export.php#95847
      * @param string $inputPem
@@ -319,15 +314,21 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string $type  contains PEM type (see OpenSSLInterface) on success
      * @throws InvalidArgumentException
      */
-    public static function pemFile2DerFile( $inputPem, $outputDer, & $type = null ) {
-        $EOLCHARS = [ "\r", "\n" ];
+    public static function pemFile2DerFile(
+        string $inputPem,
+        string $outputDer,
+        & $type = null
+    )
+    {
+        static $EOLCHARS = [ "\r", "\n" ];
+        static $SP0      = '';
         Assert::fileNameRead( $inputPem );
         self::isPemFile( $inputPem );
         Assert::fileNameWrite( $outputDer );
         $pemData  = Workshop::getFileContent( $inputPem );
         @preg_match( self::$PEMPATTERN, $pemData, $matches );
         $type     = $matches[1];
-        $pemData  = str_replace( $EOLCHARS, null, $matches[2] );
+        $pemData  = str_replace( $EOLCHARS, $SP0, $matches[2] );
         $der      = Convert::base64Decode( $pemData );
         Workshop::saveDataToFile( $outputDer, $der );
     }
@@ -341,19 +342,27 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @return string
      * @throws InvalidArgumentException
      */
-    public static function pem2DerASN1( $pem, & $type = null ) {
+    public static function pem2DerASN1( string $pem, & $type = null ) : string
+    {
         static $EOLCHARS = [ "\r", "\n" ];
+        static $SP0      = '';
         static $ARG1     = '020100300d06092a864886f70d010101050004';
         static $ARG2     = '30';
         self::assertPemString( $pem );
         @preg_match( self::$PEMPATTERN, $pem, $matches );
         $type    = $matches[1];
-        $pemData =  str_replace( $EOLCHARS, null, $matches[2] );
+        $pemData =  str_replace( $EOLCHARS, $SP0, $matches[2] );
         $derData = Convert::Hpack( $ARG1 . self::derLength( $pemData )) . $pemData;
         $derData = Convert::Hpack( $ARG2 . self::derLength( $derData )) . $derData;
         return Convert::base64Decode( $derData );
     }
-    protected static function derLength( $derData ) {
+
+    /**
+     * @param string $derData
+     * @return string
+     */
+    protected static function derLength( string $derData ) : string
+    {
         static $ZERO = '0';
         $length      = strlen( $derData );
         if( $length < 128 ) {
@@ -372,18 +381,26 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @link https://www.php.net/manual/en/ref.openssl.php#74188
      * @param string $der    (without ASN.1)
      * @param string $type   One if the PEM_* constants
-     * @param string $eol    default "\r\n"
+     * @param null|string $eol    default "\r\n"
      * @return string
      * @throws InvalidArgumentException
      */
-    public static function der2Pem( $der, $type, $eol = null ) {
+    public static function der2Pem(
+        string $der,
+        string $type,
+        $eol = null
+    ) : string
+    {
         static $FMT    = '-----BEGIN %1$s-----%2$s%3$s-----END %1$s-----%2$s';
         self::assertPemType( $type, 2 );
         if( empty( $eol )) {
             $eol = self::$PEMEOL;
         }
         return sprintf(
-            $FMT, $type, $eol, chunk_split( Convert::base64Encode( $der ), 64, $eol )
+            $FMT,
+            $type,
+            $eol,
+            chunk_split( Convert::base64Encode( $der ), 64, $eol )
         );
     }
 
@@ -394,10 +411,16 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string $derFile  input der file (without ASN.1)
      * @param string $pemFile  output pem file
      * @param string $type     One if the PEM_* constants
-     * @param string $eol      default "\r\n"
+     * @param null|string $eol      default "\r\n"
      * @throws InvalidArgumentException
      */
-    public static function derFile2PemFile( $derFile, $pemFile, $type, $eol = null ) {
+    public static function derFile2PemFile(
+        string $derFile,
+        string $pemFile,
+        string $type,
+        $eol = null
+    )
+    {
         static $FMT    = '-----BEGIN %1$s-----%2$s%3$s-----END %1$s-----%2$s';
         Assert::fileNameRead( $derFile );
         Assert::fileNameWrite( $pemFile );
@@ -415,35 +438,32 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
     /**
      * Assert $passPhrase, return null or passPhrase
      *
-     * @param mixed $passPhrase
-     * @param int|string $argIx
+     * @param null|string $passPhrase
+     * @param null|int|string $argIx
      * @return null|string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertPassPhrase( $passPhrase, $argIx = null ) {
-        $SP0 = '';
-        if( is_null( $passPhrase )) {
-            return null;
-        }
-        if( $SP0 == ( trim( $passPhrase ))) {
-                return null;
-        }
-        return Assert::string( $passPhrase, $argIx );
+    public static function assertPassPhrase( $passPhrase, $argIx = null )
+    {
+        return empty( $passPhrase )
+            ? null
+            : Assert::string( $passPhrase, $argIx );
     }
 
     /**
      * Assert (int, constant) cipherId
      *
      * @param int $cipherId
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertCipherId( $cipherId, $argIx = 1 ) {
+    public static function assertCipherId( int $cipherId, $argIx = 1 )
+    {
         static $FMTPOPTSERR = 'Invalid cipher (arg #%d), %s';
         if( ! in_array( $cipherId, OpenSSLFactory::$CIPHERS )) {
-            throw new InvalidArgumentException( sprintf( $FMTPOPTSERR, $argIx, var_export( $cipherId, true )));
+            throw new InvalidArgumentException(
+                sprintf( $FMTPOPTSERR, $argIx, var_export( $cipherId, true ))
+            );
         }
     }
 
@@ -454,21 +474,24 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string $algorithm
      * @return string  - found algorithm, uses self::getAvailableCipherMethods()
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertCipherAlgorithm( $algorithm ) {
-        return parent::baseAssertAlgorithm( self::getAvailableCipherMethods( true ), $algorithm );
+    public static function assertCipherAlgorithm( string $algorithm ) : string
+    {
+        return parent::baseAssertAlgorithm(
+            self::getAvailableCipherMethods( true ),
+            $algorithm
+        );
     }
 
     /**
      * Return array, available cipher methods
      *
-     * @param bool $aliases
+     * @param null|bool $aliases
      * @return array
-     * @static
      */
-    public static function getAvailableCipherMethods( $aliases = false ) {
-        return openssl_get_cipher_methods( $aliases );
+    public static function getAvailableCipherMethods( $aliases = false ) : array
+    {
+        return openssl_get_cipher_methods( $aliases ?? false );
     }
 
     /**
@@ -478,21 +501,24 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string $algorithm
      * @return string  - found algorithm, uses self::getAvailableDigestMethods()
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function assertMdAlgorithm( $algorithm ) {
-        return parent::baseAssertAlgorithm( self::getAvailableDigestMethods( true ), $algorithm );
+    public static function assertMdAlgorithm( string $algorithm ) : string
+    {
+        return parent::baseAssertAlgorithm(
+            self::getAvailableDigestMethods( true ),
+            $algorithm
+        );
     }
 
     /**
      * Return array, available digest (md) methods
      *
-     * @param bool $aliases
+     * @param null|bool $aliases
      * @return array
-     * @static
      */
-    public static function getAvailableDigestMethods( $aliases = false ) {
-        return openssl_get_md_methods( $aliases );
+    public static function getAvailableDigestMethods( $aliases = false ) : array
+    {
+        return openssl_get_md_methods( $aliases ?? false );
     }
 
     /**
@@ -502,17 +528,21 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      *                                       2. A string having the format (file://)path/to/file
      *                                          The named file must contain a PEM encoded certificate/private key (it may contain both)
      *                                       3. A string containing the content of a PEM encoded certificate/key
-     * @param int|string $argIx
-     * @param bool   $fileToString
-     * @param string $resourceType
-     * @param bool   $keyType                true on key, false on cert
+     * @param null|int|string $argIx
+     * @param null|bool   $fileToString
+     * @param null|string $resourceType
+     * @param null|bool   $keyType           true on key, false on cert
      * @return resource|string
      * @throws InvalidArgumentException
-     * @static
      */
     public static function assertResourceFileStringPem(
-        $source, $argIx = null, $fileToString = false, $resourceType = null, $keyType = true
-    ) {
+        $source,
+        $argIx = null,
+        $fileToString = false,
+        $resourceType = null,
+        $keyType = true
+    )
+    {
         static $FMTERRPEM = 'PEM formatted string expected';
         $type = $keyType ? self::KEY : self::$RESOURCE;
         $checkStringPem = true;
@@ -528,7 +558,7 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
                 break;
             case ( is_string( $source ) && Workshop::hasFileProtoPrefix( $source )) :
                 Assert::fileNameRead( $source, $argIx );
-                if( $fileToString ) {
+                if( $fileToString ?? false ) {
                     $source = Workshop::getFileContent( $source, $argIx );
                 }
                 else {
@@ -553,7 +583,6 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
                 throw new InvalidArgumentException(
                     sprintf( self::$FMTERR4, $type ) . self::getErrArgNoText( $argIx )
                 );
-                break;
         } // end switch
         if( $checkStringPem && ! self::isPemString( $source )) {
             foreach( explode( self::$DASHBEGIN, $source ) as $x => $part ) {
@@ -574,22 +603,21 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
 
     /**
      * clear OpenSSL errors
-     *
-     * @static
      */
-    public static function clearOpenSSLErrors() {
+    public static function clearOpenSSLErrors()
+    {
         while( false !== openssl_error_string()) {
             continue;
-        };
+        }
     }
 
     /**
      * Return (string) OpenSSL errors
      *
      * @return string
-     * @static
      */
-    public static function getOpenSSLErrors() {
+    public static function getOpenSSLErrors() : string
+    {
         $errors = [];
         while( $msg = openssl_error_string()) {
             $errors[] = $msg;
@@ -605,7 +633,6 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * The logger instance.
      *
      * @var LoggerInterface
-     * @access protected
      */
     protected $logger;
 
@@ -615,9 +642,9 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param mixed  $level
      * @param string $message
      * @param array  $context
-     * @access protected
      */
-    protected function log( $level, $message, array $context = [] ) {
+    protected function log( $level, $message, array $context = [] )
+    {
         if( ! empty( $this->logger )) {
             $this->logger->log( $level, $message, $context );
         }
@@ -626,15 +653,21 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
     /**
      * Evaluate catch, log and opt, throw RuntimeException
      *
-     * @param string    $method
-     * @param Exception $e
-     * @param bool      $warningStatus    true on warning, false on error
-     * @param string    $OpenSSLErrors
-     * @param string    $msg2
+     * @param string      $method
+     * @param Exception   $e
+     * @param bool        $warningStatus    true on warning, false on error
+     * @param string      $OpenSSLErrors
+     * @param null|string $msg2
      * @throws RuntimeException
-     * @static
      */
-    public static function assessCatch( $method, Exception $e, $warningStatus, $OpenSSLErrors, $msg2 = null ) {
+    public static function assessCatch(
+        string $method,
+        Exception $e,
+        bool $warningStatus,
+        string $OpenSSLErrors,
+        $msg2 = null
+    )
+    {
         static $mthdName = 'getSeverityText';
         static $FMTERR2  = '(PHP %s) %s';
         $logger   = LoggerDepot::getLogger( get_called_class());
@@ -649,7 +682,7 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
         $logger->log( $logLevel, $message );
         $logger->log( $logLevel, $e->getMessage());
         if( ! $warningStatus ) {
-            throw new RuntimeException( $message, null, $e );
+            throw new RuntimeException( $message, $e->getCode(), $e );
         }
     }
 
@@ -657,12 +690,16 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * Return array, available digest (md) methods
      *
      * @param string $method
-     * @param string $msg2
-     * @param string $OpenSSLErrors
+     * @param null|string $msg2
+     * @param null|string $OpenSSLErrors
      * @throws RuntimeException
-     * @static
      */
-    public static function logAndThrowRuntimeException( $method, $msg2 = null, $OpenSSLErrors = null ) {
+    public static function logAndThrowRuntimeException(
+        string $method,
+        $msg2 = null,
+        $OpenSSLErrors = null
+    )
+    {
         $logger  = LoggerDepot::getLogger( get_called_class());
         $message = sprintf( self::$FMTERR1, $method, LogLevel::ERROR, 2, $msg2 );
         if( ! empty( $OpenSSLErrors )) {
@@ -682,27 +719,33 @@ abstract class OpenSSLBaseFactory extends BaseFactory implements OpenSSLInterfac
      * @param string|resource $resource
      * @param string          $resourceType
      * @return bool
-     * @access protected
-     * @static
      */
-    protected static function isValidResource( $resource, $resourceType ) {
-        return ( is_resource( $resource ) && ( $resourceType == get_resource_type( $resource )));
+    protected static function isValidResource( $resource, string $resourceType ) : bool
+    {
+        return ( is_resource( $resource ) &&
+            ( $resourceType == get_resource_type( $resource )));
     }
 
     /**
      * Return resource error message
      *
      * @param string          $method
-     * @param string|resource $resource
      * @param string          $resourceType
+     * @param string|resource $resource
      * @return string
-     * @access protected
-     * @static
      */
-    protected static function getErrRscMsg( $method, $resourceType, $resource ) {
+    protected static function getErrRscMsg(
+        string $method,
+        string $resourceType,
+        $resource
+    ) : string
+    {
         static $FMERRTYPERESOURCE = ', Resource (\'%s\') expected, got \'%s\'';
         return  self::getCm( $method ) .
-            sprintf( $FMERRTYPERESOURCE, $resourceType, Workshop::getResourceType( $resource ));
+            sprintf(
+                $FMERRTYPERESOURCE,
+                $resourceType,
+                Workshop::getResourceType( $resource )
+            );
     }
-
 }

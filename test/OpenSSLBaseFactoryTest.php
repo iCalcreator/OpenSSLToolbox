@@ -4,34 +4,32 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
- *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  */
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
 use Kigkonsult\LoggerDepot\LoggerDepot;
 use Psr\Log\NullLogger;
+use Throwable;
 
 /**
  * Class OpenSSLBaseFactoryTest
@@ -301,7 +299,7 @@ SX+KN+yR40WVThEjlJysOv3kj4Fbe75p/sVNqz2qo6fIj+kZ2Q==
      * @dataProvider assertPemTest12Provider
      * @param int    $case
      * @param string $string
-     * @param string $expected
+     * @param mixed $expected
      */
     public function isPemTest11( $case, $string, $expected ) {
         $case += 110;
@@ -327,7 +325,7 @@ SX+KN+yR40WVThEjlJysOv3kj4Fbe75p/sVNqz2qo6fIj+kZ2Q==
         Workshop::saveDataToFile( $file, $string );
         $this->assertEquals(
             ! ( false === $expected ),
-            OpenSSLFactory::isPemFile( $file, $type ),
+            OpenSSLFactory::isPemFile( $file ),
             sprintf( self::$FMT, OpenSSLFactory::getCm( __METHOD__ ), $case, 3 )
         );
         if( false !== $expected ) {
@@ -443,7 +441,7 @@ SX+KN+yR40WVThEjlJysOv3kj4Fbe75p/sVNqz2qo6fIj+kZ2Q==
         try {
             $der = OpenSSLFactory::pem2Der( 'grodan boll' );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -460,9 +458,9 @@ SX+KN+yR40WVThEjlJysOv3kj4Fbe75p/sVNqz2qo6fIj+kZ2Q==
         $case    = 139;
         $outcome = true;
         try {
-            $der = OpenSSLFactory::der2pem( self::$privateKeyString1, 'grodan boll' );
+            $der = OpenSSLFactory::der2Pem( self::$privateKeyString1, 'grodan boll' );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -543,7 +541,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
         try {
             OpenSSLPkeyFactory::assertPkey( [] );
         }
-        catch( Exception $e ) {
+        catch( Throwable $e ) {
             $outcome = false;
         }
 
@@ -571,7 +569,12 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
         foreach( $privateSources as $x => $privateSource ) {
             $this->assertNotFalse(
                 OpenSSLPkeyFactory::assertPkey( $privateSource,  1, true  ),
-                sprintf( self::$FMT, OpenSSLPkcs7Factory::getCm( __METHOD__ ), ( 150 + $x ), null )
+                sprintf(
+                    self::$FMT,
+                    OpenSSLPkcs7Factory::getCm( __METHOD__ ),
+                    ( 150 . '-' . $x ),
+                    null
+                )
             );
         }
 
@@ -581,7 +584,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
                 $privateKeyResource, 1, null, OpenSSLX509Factory::X509RESOURCETYPE
             );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -599,7 +602,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
         try {
             $pem = OpenSSLPkeyFactory::assertPkey( 'grodan boll' . self::$privateKeyString1 );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -634,7 +637,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
         try {
             OpenSSLPkcs7Factory::assertCipherId( 13 );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -647,7 +650,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
         try {
             OpenSSLPkcs7Factory::assertCipherId( 5 );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertTrue(
@@ -706,7 +709,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
                 'msg2'
             );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertTrue(
@@ -725,7 +728,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
                 'msg2'
             );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(
@@ -745,7 +748,7 @@ aHkMuIX9qc1FvFEx/K9hSncCAwEAAQ==
         try {
             OpenSSLPkeyFactory::logAndThrowRuntimeException( __METHOD__, 'msg2', 'OpenSSLErrors' );
         }
-        catch( exception $e ) {
+        catch( Exception $e ) {
             $outcome = false;
         }
         $this->assertFalse(

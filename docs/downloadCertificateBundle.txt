@@ -1,0 +1,4 @@
+
+download certificate bundle:
+http://curl.haxx.se/docs/caextract.html
+

@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -73,6 +71,10 @@ use function strpos;
  */
 class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
 {
+    /**
+     * @var string
+     */
+    private static $SP0 = '';
 
     /**
      * @var resource|string        1. An X.509 resource returned from openssl_x509_read()
@@ -104,10 +106,10 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      *                               'extracerts'   array of extra certificates or a single certificate to be included in the PKCS#12 file.
      *                               'friendlyname' string to be used for the supplied certificate and key
      */
-    private $args = null;
+    private $args = [];
 
     /**
-     * @var string                The pkcs12 (string) resource
+     * @var null|string            The pkcs12 (string) resource
      */
     private $pkcs12 = null;
 
@@ -116,11 +118,11 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      *
      * If all but 'args' arguments are set, a new string pkcs12 are set ( using export)
      *
-     * @param resource|string $x509        1. An X.509 resource returned from openssl_x509_read()
+     * @param null|resource|string $x509   1. An X.509 resource returned from openssl_x509_read()
      *                                     2. A string having the format (file://)path/to/cert.pem
      *                                        The named file must contain a (single) PEM encoded certificate
      *                                     3. A string containing the content of a (single) PEM encoded certificate
-     * @param resource|string|array $privateKey
+     * @param null|resource|string|array $privateKey
      *                                     1. A key resource returned from openssl_get_publickey() or openssl_get_privatekey()
      *                                     2. A string having the format (file://)path/to/file.pem
      *                                        The named file must contain a PEM encoded certificate/private key (it may contain both)
@@ -128,14 +130,20 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      *                                     4 For private keys, you may also use the syntax array($key, $passphrase)
      *                                       where $key represents a key specified using the file or textual content notation above,
      *                                       and $passphrase represents a string containing the passphrase for that private key
-     * @param string $pkcs12passWord       Encryption password for unlocking the PKCS#12
-     * @param array  $args                 Optional array, other keys will be ignored
+     * @param null|string $pkcs12passWord  Encryption password for unlocking the PKCS#12
+     * @param null|array  $args            Optional array, other keys will be ignored
      *                                      'extracerts'   array of extra certificates or a single certificate to be included in the PKCS#12 file.
      *                                      'friendlyname' string to be used for the supplied certificate and key
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function __construct( $x509 = null, $privateKey = null, $pkcs12passWord = null, $args = null ) {
+    public function __construct(
+        $x509 = null,
+        $privateKey = null,
+        $pkcs12passWord = null,
+        $args = null
+    )
+    {
         $this->logger = LoggerDepot::getLogger( get_class() );
         $this->log(LogLevel::INFO, self::initClassStr());
         $setReady     = 0;
@@ -155,7 +163,12 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
         }
         if( 3 == $setReady ) {
             $this->setPkcs12(
-                self::export( $this->getX509(), $this->getPrivateKey(), $this->getPkcs12PassWord(), $this->getArgs())
+                self::export(
+                    $this->getX509(),
+                    $this->getPrivateKey(),
+                    $this->getPkcs12PassWord(),
+                    $this->getArgs()
+                )
             );
         }
     }
@@ -163,11 +176,11 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
     /**
      * Class factory method
      *
-     * @param resource|string $x509        1. An X.509 resource returned from openssl_x509_read()
+     * @param null|resource|string $x509   1. An X.509 resource returned from openssl_x509_read()
      *                                     2. A string having the format (file://)path/to/cert.pem
      *                                        The named file must contain a (single) PEM encoded certificate
      *                                     3. A string containing the content of a (single) PEM encoded certificate
-     * @param resource|string|array $privateKey
+     * @param null|resource|string|array $privateKey
      *                                     1. A key resource returned from openssl_get_publickey() or openssl_get_privatekey()
      *                                     2. A string having the format (file://)path/to/file.pem
      *                                        The named file must contain a PEM encoded certificate/private key (it may contain both)
@@ -175,15 +188,20 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      *                                     4 For private keys, you may also use the syntax array($key, $passphrase)
      *                                       where $key represents a key specified using the file or textual content notation above,
      *                                       and $passphrase represents a string containing the passphrase for that private key
-     * @param string $pkcs12passWord       Encryption password for unlocking the PKCS#12
-     * @param array  $args                 Optional array, other keys will be ignored
+     * @param null|string $pkcs12passWord  Encryption password for unlocking the PKCS#12
+     * @param null|array  $args            Optional array, other keys will be ignored
      *                                      'extracerts'   array of extra certificates or a single certificate to be included in the PKCS#12 file.
      *                                      'friendlyname' string to be used for the supplied certificate and key
      * @return static
-     * @access static
      * @throws InvalidArgumentException
      */
-    public static function factory( $x509 = null, $privateKey = null, $pkcs12passWord = null, $args = null ) {
+    public static function factory(
+        $x509 = null,
+        $privateKey = null,
+        $pkcs12passWord = null,
+        $args = null
+    ) : self
+    {
         return new self( $x509 , $privateKey, $pkcs12passWord, $args );
     }
 
@@ -196,8 +214,12 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function saveCertificateStoreIntoFile( $fileName ) {
-        $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
+    public function saveCertificateStoreIntoFile( string $fileName ) : self
+    {
+        $this->log(
+            LogLevel::DEBUG,
+            self::$INIT . self::getCm( __METHOD__ )
+        );
         Assert::fileNameWrite( $fileName );
         if( ! $this->isX509Set()) {
             throw new RuntimeException( sprintf( self::$FMTERR4, 'x509' ));
@@ -206,7 +228,11 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
             throw new RuntimeException( sprintf( self::$FMTERR4, 'privateKey' ));
         }
         self::exportToFile(
-            $this->getX509(), $fileName, $this->getPrivateKey(), $this->getPkcs12PassWord(), $this->getArgs()
+            $this->getX509(),
+            $fileName,
+            $this->getPrivateKey(),
+            $this->getPkcs12PassWord(),
+            $this->getArgs()
         );
         return $this;
     }
@@ -215,22 +241,21 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * Return array of parsed PKCS#12 Certificate Store - uses openssl_pkcs12_read
      *
      * @link https://www.php.net/manual/en/function.openssl-pkcs12-read.php
-     * @param string $pkcs12         1.  The certificate store content (not file)
-     *                               2.  'file://'-prefixed (!!) fileName with certificate store content
-     * @param string pkcs12passWord  Encryption password for unlocking the PKCS#12
+     * @param string $pkcs12          1.  The certificate store content (not file)
+     *                                2.  'file://'-prefixed (!!) fileName with certificate store content
+     * @param null|string $pkcs12passWord  Encryption password for unlocking the PKCS#12
      * @return array
      * @throws InvalidArgumentException
      * @throws RunTimeException
-     * @static
      */
-    public static function read( $pkcs12, $pkcs12passWord = '' ) {
-        $logger = LoggerDepot::getLogger( get_called_class() );
+    public static function read( string $pkcs12, $pkcs12passWord = '' ) : array
+    {
+        $logger     = LoggerDepot::getLogger( get_called_class() );
         $logger->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
-        Assert::string( $pkcs12, 1 );
         if( Workshop::hasFileProtoPrefix( $pkcs12 ) && is_file( $pkcs12 )) {
             $pkcs12 = Workshop::getFileContent( $pkcs12 );
         }
-        Assert::string( $pkcs12passWord, 2 );
+        $pkcs12passWord = Assert::string( $pkcs12passWord, 2, self::$SP0 );
         $result = false;
         $output = [];
         self::clearOpenSSLErrors();
@@ -239,13 +264,22 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
             $result = openssl_pkcs12_read( $pkcs12, $output, $pkcs12passWord );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors() );
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $logger->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ) ); // test ###
         return $output;
@@ -259,7 +293,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function getKeys() {
+    public function getKeys() : array
+    {
         static $PRIVATE = 'PRIVATE';
         $output = [];
         foreach( $this->getCertificateStoreAsArray() as $pemString ) {
@@ -278,7 +313,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function getCertificates() {
+    public function getCertificates() : array
+    {
         static $CERTIFICATE = 'CERTIFICATE';
         $output = [];
         foreach( $this->getCertificateStoreAsArray() as $pemString ) {
@@ -297,7 +333,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function getCertificateStoreAsArray() {
+    public function getCertificateStoreAsArray() : array
+    {
         static $PKCS12 = 'pkcs12';
         if( ! $this->isPkcs12Set()) {
             throw new RuntimeException( sprintf( self::$FMTERR4, $PKCS12 ));
@@ -321,16 +358,22 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      *                                     4 For private keys, you may also use the syntax array($key, $passphrase)
      *                                       where $key represents a key specified using the file or textual content notation above,
      *                                       and $passphrase represents a string containing the passphrase for that private key
-     * @param string $pkcs12passWord       Encryption password for unlocking the PKCS#12
-     * @param array  $args                 Optional array, other keys will be ignored
+     * @param null|string $pkcs12passWord
+     *                                     Encryption password for unlocking the PKCS#12
+     * @param null|array  $args            Optional array, other keys will be ignored
      *                                      'extracerts'   array of extra certificates or a single certificate to be included in the PKCS#12 file.
      *                                      'friendlyname' string to be used for the supplied certificate and key
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function export( $x509, $privateKey, $pkcs12passWord, $args = null ) {
+    public static function export(
+        $x509,
+        $privateKey,
+        $pkcs12passWord,
+        $args = null
+    ) : string
+    {
         $logger         = LoggerDepot::getLogger( get_called_class());
         $logger->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         $x509           = OpenSSLX509Factory::assertX509( $x509, 1 );
@@ -342,10 +385,21 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_pkcs12_export( $x509, $output, $privateKey, $pkcs12passWord, $args );
+            $result = openssl_pkcs12_export(
+                $x509,
+                $output,
+                $privateKey,
+                ( $pkcs12passWord ?? self::$SP0 ),
+                $args
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
@@ -380,16 +434,23 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      *                                     4 For private keys, you may also use the syntax array($key, $passphrase)
      *                                       where $key represents a key specified using the file or textual content notation above,
      *                                       and $passphrase represents a string containing the passphrase for that private key
-     * @param string $pkcs12passWord       Encryption password for unlocking the PKCS#12
-     * @param array  $args                 Optional array, other keys will be ignored
+     * @param null|string $pkcs12passWord
+     *                                     Encryption password for unlocking the PKCS#12
+     * @param null|array  $args            Optional array, other keys will be ignored
      *                                      'extracerts'   array of extra certificates or a single certificate to be included in the PKCS#12 file.
      *                                      'friendlyname' string to be used for the supplied certificate and key
      * @return bool                        true on success
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function exportToFile( $x509, $fileName, $privateKey, $pkcs12passWord, $args = null ) {
+    public static function exportToFile(
+        $x509,
+        string $fileName,
+        $privateKey,
+        $pkcs12passWord,
+        $args = null
+    ) : bool
+    {
         $logger         = LoggerDepot::getLogger( get_called_class());
         $logger->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         $x509           = OpenSSLX509Factory::assertX509( $x509, 1 );
@@ -398,20 +459,34 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
         $pkcs12passWord = self::assertPassPhrase( $pkcs12passWord, 4 );
         $args           = self::assertArgs( $args );
         $result         = false;
-        $output         = null;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_pkcs12_export_to_file( $x509, $fileName, $privateKey, $pkcs12passWord, $args );
+            $result = openssl_pkcs12_export_to_file(
+                $x509,
+                $fileName,
+                $privateKey,
+                ( $pkcs12passWord ?? self::$SP0 ),
+                $args
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( self::getCm( __METHOD__ ), $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                self::getCm( __METHOD__ ),
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( self::getCm( __METHOD__ ), null, self::getOpenSSLErrors() );
+            self::logAndThrowRuntimeException(
+                self::getCm( __METHOD__ ),
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         $logger->log( LogLevel::DEBUG, self::$PASSED . self::getCm( __METHOD__ ) ); // test ###
         return true;
@@ -424,14 +499,16 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
     /**
      * @return resource|string  x509
      */
-    public function getX509() {
+    public function getX509()
+    {
         return $this->x509;
     }
 
     /**
      * @return bool
      */
-    public function isX509Set() {
+    public function isX509Set() : bool
+    {
         return ( ! empty( $this->x509 ));
     }
 
@@ -445,7 +522,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException;
      */
-    public function setX509( $x509 ) {
+    public function setX509( $x509 ) : self
+    {
         $this->x509   = OpenSSLX509Factory::assertX509( $x509 );
         $this->pkcs12 = null;
         return $this;
@@ -454,14 +532,16 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
     /**
      * @return array|resource|string
      */
-    public function getPrivateKey() {
+    public function getPrivateKey()
+    {
         return $this->privateKey;
     }
 
     /**
      * @return bool
      */
-    public function isPrivateKeySet() {
+    public function isPrivateKeySet() : bool
+    {
         return ( ! empty( $this->privateKey ));
     }
 
@@ -479,23 +559,26 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setPrivateKey( $privateKey ) {
+    public function setPrivateKey( $privateKey ) : self
+    {
         $this->privateKey = OpenSSLPkeyFactory::assertPkey( $privateKey );
         $this->pkcs12 = null;
         return $this;
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getPkcs12PassWord() {
+    public function getPkcs12PassWord()
+    {
         return $this->pkcs12passWord;
     }
 
     /**
      * @return bool
      */
-    public function isPkcs12passWordSet() {
+    public function isPkcs12passWordSet() : bool
+    {
         return ( ! empty( $this->pkcs12passWord ));
     }
 
@@ -504,26 +587,28 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setPkcs12PassWord( $pkcs12passWord ) {
+    public function setPkcs12PassWord( string $pkcs12passWord ) : self
+    {
         if( empty( $pkcs12passWord )) {
             throw new InvalidArgumentException( sprintf( self::$FMTERR4, 'string' ));
         }
-        $this->pkcs12passWord = Assert::string( $pkcs12passWord );
-        $this->pkcs12         = null;
+        $this->pkcs12 = null;
         return $this;
     }
 
     /**
      * @return array
      */
-    public function getArgs() {
+    public function getArgs() : array
+    {
         return $this->args;
     }
 
     /**
      * @return bool
      */
-    public function isArgsSet() {
+    public function isArgsSet() : bool
+    {
         return ( ! empty( $this->args ));
     }
 
@@ -532,7 +617,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setArgs( $args ) {
+    public function setArgs( array $args ) : self
+    {
         $this->args   = self::assertArgs( $args );
         $this->pkcs12 = null;
         return $this;
@@ -546,7 +632,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * @return string
      * @throws RuntimeException
      */
-    public function getPkcs12() {
+    public function getPkcs12() : string
+    {
         static $X509       = 'x509';
         static $PRIVATEKEY = 'privateKey';
         if( $this->isPkcs12Set()) {
@@ -560,7 +647,12 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
             throw new RuntimeException( sprintf( self::$FMTERR4, $PRIVATEKEY ));
         }
         $this->setPkcs12(
-            self::export( $this->getX509(), $this->getPrivateKey(), $this->getPkcs12PassWord(), $this->getArgs())
+            self::export(
+                $this->getX509(),
+                $this->getPrivateKey(),
+                $this->getPkcs12PassWord(),
+                $this->getArgs()
+            )
         );
         return $this->pkcs12;
     }
@@ -568,7 +660,8 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
     /**
      * @return bool
      */
-    public function isPkcs12Set() {
+    public function isPkcs12Set() : bool
+    {
         return ( ! empty( $this->pkcs12 ));
     }
 
@@ -576,10 +669,11 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
      * Set pkcs12 and, opt, pkcs12password
      *
      * @param string $pkcs12
-     * @param string $pkcs12passWord
+     * @param null|string $pkcs12passWord
      * @return static
      */
-    public function setPkcs12( $pkcs12, $pkcs12passWord = null ) {
+    public function setPkcs12( string $pkcs12, $pkcs12passWord = null ) : self
+    {
         $this->pkcs12 = $pkcs12;
         if( ! empty( $pkcs12passWord )) {
             $this->pkcs12passWord = Assert::string( $pkcs12passWord );
@@ -590,14 +684,13 @@ class OpenSSLPkcs12Factory extends OpenSSLBaseFactory
     /**
      * Return bool true if args is valid
      *
-     * @param array $args
+     * @param null|array $args
      * @return array
-     * @access private
-     * @static
      * @throws InvalidArgumentException
      * @todo assert extraArgs (array) string/file
      */
-    private static function assertArgs( $args = null ) {
+    private static function assertArgs( $args = null ) : array
+    {
         static $FMTERR = 'array expected, got %s';
         if( empty( $args )) {
             return [];

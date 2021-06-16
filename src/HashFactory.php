@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use InvalidArgumentException;
@@ -52,7 +50,6 @@ use function hash;
  */
 class HashFactory extends BaseFactory
 {
-
     /**
      * List of PHP 7.0.25 registered hashing algorithms (using hash_algos) supporting PHP hash
      * Note, it may exist algorithms in NOT supported by PHP hash_hmac
@@ -68,11 +65,11 @@ class HashFactory extends BaseFactory
      * Assert algorithm (return found)
      *
      * @param string $algorithm
-     * @throws InvalidArgumentException
      * @return string
-     * @static
+     * @throws InvalidArgumentException
      */
-    public static function assertAlgorithm( $algorithm ) {
+    public static function assertAlgorithm( string $algorithm ) : string
+    {
         return parent::baseAssertAlgorithm( hash_algos(), strtolower( $algorithm ), true );
     }
 
@@ -80,36 +77,44 @@ class HashFactory extends BaseFactory
      * Return a hash value (message digest), applied on (string) argument
      *
      * @link https://www.php.net/manual/en/function.hash.php
-     * @param string $algorithm
-     * @param string $data
-     * @param bool   $rawOutput
+     * @param string     $algorithm
+     * @param string     $data
+     * @param null|bool  $rawOutput
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getDigestHash( $algorithm, $data, $rawOutput = false ) {
+    public static function getDigestHash(
+        string $algorithm,
+        string $data,
+        $rawOutput = false
+    ) : string
+    {
         $algorithm = self::assertAlgorithm( $algorithm );
         $data      = Assert::string( $data, 2 );
         $rawOutput = Assert::bool( $rawOutput, 3, false );
-        return hash( $algorithm, $data, $rawOutput );
+        return hash( $algorithm, $data, ( $rawOutput ?? false ));
     }
 
     /**
      * Return a hash value using the contents of a given file
      *
      * @link https://www.php.net/manual/en/function.hash-file.php
-     * @param string $algorithm
-     * @param string $fileName   - URL describing location of file to be hashed; Supports fopen wrappers.
-     * @param bool   $rawOutput
+     * @param string     $algorithm
+     * @param string     $fileName   - URL describing location of file to be hashed; Supports fopen wrappers.
+     * @param null|bool  $rawOutput
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getDigestHashFromFile( $algorithm, $fileName, $rawOutput = false ) {
+    public static function getDigestHashFromFile(
+        string $algorithm,
+        string $fileName,
+        $rawOutput = false
+    ) : string
+    {
         $algorithm = self::assertAlgorithm( $algorithm );
         Assert::fileNameRead( $fileName, 2 );
         $rawOutput = Assert::bool( $rawOutput, 3, false );
-        return hash_file( $algorithm, $fileName, $rawOutput );
+        return hash_file( $algorithm, $fileName, ( $rawOutput ?? false ));
     }
 
     /**
@@ -118,9 +123,9 @@ class HashFactory extends BaseFactory
      * @param string $expected
      * @param string $actual
      * @return bool
-     * @static
      */
-    public static function hashEquals( $expected, $actual ) {
+    public static function hashEquals( string $expected, string $actual ) : bool
+    {
         return hash_equals( $expected, $actual );
     }
 
@@ -132,22 +137,29 @@ class HashFactory extends BaseFactory
      * @link https://tools.ietf.org/html/rfc8018
      * @param string $algorithm   Name of selected hashing algorithm (https://www.php.net/manual/en/function.hash-algos.php)
      * @param string $passWord    The password to use for the derivation
-     * @param string $salt        The salt to use for the derivation. This value should be generated randomly.
+     * @param null|string $salt   The salt to use for the derivation. This value should be generated randomly.
      *                            default 64 bytes
-     * @param int    $iterations  The number of internal iterations to perform for the derivation.
-     * @param int    $length      The length of the output string.
+     * @param null|int $iterations
+     *                            The number of internal iterations to perform for the derivation.
+     * @param null|int $length    The length of the output string.
      *                            If raw_output is TRUE this corresponds to the byte-length of the derived key,
      *                            if raw_output is FALSE this corresponds to twice the byte-length of the derived key
      *                            (as every byte of the key is returned as two hexits).
      *                            if 0 is passed, the entire output of the supplied algorithm is used.
-     * @param bool  $rawOutput    TRUE, outputs raw binary data. FALSE outputs lowercase hexits.
+     * @param null|bool $rawOutput
+     *                            TRUE, outputs raw binary data. FALSE outputs lowercase hexits.
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
     public static function getHashPbkdf2(
-        $algorithm, $passWord, $salt = null, $iterations = 10000, $length = 0, $rawOutput = false
-    ) {
+        string $algorithm,
+        string $passWord,
+        $salt = null,
+        $iterations = 10000,
+        $length = 0,
+        $rawOutput = false
+    ) : string
+    {
         self::assertAlgorithm( $algorithm );
         Assert::string( $passWord, 2 );
         if( empty( $salt )) {
@@ -158,8 +170,13 @@ class HashFactory extends BaseFactory
         }
         $iterations = Assert::int( $iterations, 4, 10000 );
         $length     = Assert::int( $length, 5, 0 );
-        $rawOutput  = Assert::bool( $rawOutput, 6, false );
-        return hash_pbkdf2( $algorithm, $passWord, $salt, $iterations, $length, $rawOutput );
+        return hash_pbkdf2(
+            $algorithm,
+            $passWord,
+            $salt,
+            $iterations,
+            $length,
+            ( $rawOutput ?? false )
+        );
     }
-
 }

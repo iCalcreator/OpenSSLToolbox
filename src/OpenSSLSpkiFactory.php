@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -86,7 +84,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RunTimeException
      */
-    public function __construct( $privateKey = null, $challenge = null, $algorithm = 0 ) {
+    public function __construct( $privateKey = null, $challenge = null, $algorithm = 0 )
+    {
         $this->logger  = LoggerDepot::getLogger( get_class() );
         $this->log(LogLevel::INFO, self::initClassStr());
         $setReady      = 0;
@@ -116,9 +115,13 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException
      * @throws RunTimeException
-     * @access static
      */
-    public static function factory( $privateKey = null, $challenge = null, $algorithm = 0 ) {
+    public static function factory(
+        $privateKey = null,
+        $challenge = null,
+        $algorithm = 0
+    ) : self
+    {
         return new self( $privateKey, $challenge, $algorithm );
     }
 
@@ -129,7 +132,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @return string
      * @throws RuntimeException
      */
-    public function export() {
+    public function export() : string
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isSpkiacSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -159,7 +163,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @return string
      * @throws RuntimeException
      */
-    public function getSPKACasString() {
+    public function getSPKACasString() : string
+    {
         return $this->export();
     }
 
@@ -170,7 +175,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @return string
      * @throws RuntimeException
      */
-    public function exportChallenge() {
+    public function exportChallenge() : string
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         if( ! $this->isSpkiacSet()) {
             throw new RuntimeException( self::$FMTERR2 );
@@ -200,7 +206,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @return string
      * @throws RuntimeException
      */
-    public function getChallengeAsString() {
+    public function getChallengeAsString() : string
+    {
         return $this->exportChallenge();
     }
 
@@ -222,7 +229,12 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function spkiNew( $privateKey, $challenge, $algorithm = 0 ) {
+    public function spkiNew(
+        $privateKey,
+        string $challenge,
+        $algorithm = 0
+    ) : self
+    {
         static $FMTMSG = 'Algorithm set to (1) OPENSSL_ALGO_SHA1';
         static $FMTERR = 'Invalid algorithm %s';
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
@@ -240,7 +252,6 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
                 break;
             default :
                 throw new InvalidArgumentException( sprintf( $FMTERR, $algorithm ));
-                break;
         }
         $result = null;
         self::clearOpenSSLErrors();
@@ -269,9 +280,9 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @link https://www.php.net/manual/en/function.openssl-spki-verify.php
      * @param string  $spkac     a valid(?) signed public key and challenge
      * @return bool
-     * @static
      */
-    public static function verify( $spkac ) {
+    public static function verify( string $spkac ) : bool
+    {
         $logger = LoggerDepot::getLogger( get_called_class());
         $logger->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         Assert::string( $spkac );
@@ -307,7 +318,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @param string $spkac
      * @return string
      */
-    public static function removePrefix( $spkac ) {
+    public static function removePrefix( string $spkac ) : string
+    {
         return ( self::$prefix == substr( $spkac, 0, 6 )) ? substr( $spkac, 6 ) : $spkac;
     }
 
@@ -315,14 +327,16 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * Return SPKAC without leading 'SPKAC='
      * @return string
      */
-    public function getSpkac() {
+    public function getSpkac() : string
+    {
         return $this->spkac;
     }
 
     /**
      * @return bool
      */
-    public function isSpkiacSet() {
+    public function isSpkiacSet() : bool
+    {
         return ( ! empty( $this->spkac ));
     }
 
@@ -332,7 +346,8 @@ class OpenSSLSpkiFactory extends OpenSSLBaseFactory
      * @return static
      * @throws InvalidArgumentException
      */
-    public function setSpkac( $spkac ) {
+    public function setSpkac( string $spkac ) : self
+    {
         $this->log( LogLevel::DEBUG, self::$INIT . self::getCm( __METHOD__ ));
         static $FMT  = 'Unsuccessfull verification of the spkac';
         Assert::string( $spkac );

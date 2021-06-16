@@ -164,12 +164,25 @@ $encrypted = OpenSSLFactory::getprivateKeyEncryptedString( $data, $privateKeyStr
 $decrypted = OpenSSLFactory::getpublicKeyDecryptedString( $encrypted, $publicKeyString );
 ```
 
+
 #### Info
 
 You will find 
 - class information in [docs](docs/docs.md) folder 
 - convenient constants in [src/OpenSSLInterface](src/OpenSSLInterface.php)
 - a lot of more examples in the test folder.
+
+
+#### Support
+
+For support, please use [Github]/issues. Non-emergence support issues are, unless sponsored, fixed in due time.
+
+
+###### Sponsorship
+
+Donation using <a href="https://paypal.me/kigkonsult" rel="nofollow">paypal.me/kigkonsult</a> are appreciated.
+For invoice, <a href="mailto:ical@kigkonsult.se">please e-mail</a>.
+
 
 #### Installation
 
@@ -206,18 +219,19 @@ namepace Kigkonsult\OpenSSLToolbox;
 include 'pathToSource/OpenSSLToolbox/autoload.php';
 ```
 
-Run tests
+
+###### Tests
+
 ```
 cd pathToSource/OpenSSLToolbox
 vendor/bin/phpunit
 ```
+
+Tests are executed in ```LOG``` mode, to alter, update _PHP_ const last in ```phpunit.xml```.  
 Note, it will takes some time, 80% coverage...<br>
 But still remain untested parts, help appreciated.
 
-#### Support
-
-For support, please use [Github]/issues.
-
+Assert PHP 7+ using [PHPCompatibility] and [PHPStan].
 
 #### License
 

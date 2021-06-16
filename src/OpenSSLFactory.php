@@ -4,42 +4,40 @@
  *
  * This file is a part of OpenSSLToolbox.
  *
- * Copyright 2020 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
- * author    Kjell-Inge Gustafsson, kigkonsult
- * Link      https://kigkonsult.se
- * Version   0.971
- * License   GNU Lesser General Public License version 3
+ * @author    Kjell-Inge Gustafsson, kigkonsult <ical@kigkonsult.se>
+ * @copyright 2020-21 Kjell-Inge Gustafsson, kigkonsult, All rights reserved
+ * @link      https://kigkonsult.se
+ * @license   Subject matter of licence is the software Asit. The above
+ *            copyright, link, package and version notices, this licence notice shall be
+ *            included in all copies or substantial portions of the OpenSSLToolbox.
  *
- *   Subject matter of licence is the software OpenSSLToolbox. The above
- *   copyright, link, package and version notices, this licence notice shall be
- *   included in all copies or substantial portions of the OpenSSLToolbox.
+ *            OpenSSLToolbox is free software: you can redistribute it and/or modify it
+ *            under the terms of the GNU Lesser General Public License as published by
+ *            the Free Software Foundation, either version 3 of the License, or (at your
+ *            option) any later version.
  *
- *   OpenSSLToolbox is free software: you can redistribute it and/or modify it
- *   under the terms of the GNU Lesser General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or (at your
- *   option) any later version.
+ *            OpenSSLToolbox is distributed in the hope that it will be useful, but
+ *            WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *            or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ *            License for more details.
  *
- *   OpenSSLToolbox is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- *   or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
- *   License for more details.
+ *            You should have received a copy of the GNU Lesser General Public License
+ *            along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
  *
- *   You should have received a copy of the GNU Lesser General Public License
- *   along with OpenSSLToolbox. If not, see <https://www.gnu.org/licenses/>.
+ *            Disclaimer of rights
  *
- * Disclaimer of rights
+ *            Herein may exist software logic (hereafter solution(s)) found on internet
+ *            (hereafter originator(s)). The rights of each solution belongs to
+ *            respective originator;
  *
- *   Herein may exist software logic (hereafter solution(s)) found on internet
- *   (hereafter originator(s)). The rights of each solution belongs to
- *   respective originator;
+ *            Credits and acknowledgements to originators!
+ *            Links to originators are found wherever appropriate.
  *
- *   Credits and acknowledgements to originators!
- *   Links to originators are found wherever appropriate.
- *
- *   Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
- *   and solutions derived works and OpenSSLToolbox collection of solutions are
- *   covered by GNU Lesser General Public License, above.
+ *            Only OpenSSLToolbox copyright holder works, OpenSSLToolbox author(s) works
+ *            and solutions derived works and OpenSSLToolbox collection of solutions are
+ *            covered by GNU Lesser General Public License, above.
  */
+declare( strict_types = 1 );
 namespace Kigkonsult\OpenSSLToolbox;
 
 use Exception;
@@ -49,7 +47,6 @@ use RuntimeException;
 use function array_combine;
 use function array_keys;
 use function in_array;
-use function is_null;
 use function openssl_cipher_iv_length;
 use function openssl_decrypt;
 use function openssl_digest;
@@ -93,11 +90,8 @@ use function var_export;
  */
 class OpenSSLFactory extends OpenSSLBaseFactory
 {
-
     /**
      * @var array  (values as keys)
-     * @access private
-     * @static
      */
     private static $OPENSSLPADDINGS4 = [
         1 => OPENSSL_PKCS1_PADDING,
@@ -110,16 +104,22 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * Assert opts
      *
      * @param int $opts
-     * @param int|string $argIx
+     * @param null|int|string $argIx
      * @throws InvalidArgumentException
-     * @access private
-     * @static
      */
-    private static function assertOpts( $opts, $argIx = 1 ) {
-        static $OPTSARR     = [ 0, OPENSSL_RAW_DATA, OPENSSL_ZERO_PADDING, OPENSSL_RAW_DATA|OPENSSL_ZERO_PADDING ];
+    private static function assertOpts( int $opts, $argIx = 1 )
+    {
+        static $OPTSARR     = [
+            0,
+            OPENSSL_RAW_DATA,
+            OPENSSL_ZERO_PADDING,
+            OPENSSL_RAW_DATA|OPENSSL_ZERO_PADDING
+        ];
         static $FMTPOPTSERR = 'Invalid option arg (#%d), %s';
         if( ! in_array( $opts, $OPTSARR )) {
-            throw new InvalidArgumentException( sprintf( $FMTPOPTSERR, $argIx, var_export( $opts, true )));
+            throw new InvalidArgumentException(
+                sprintf( $FMTPOPTSERR, $argIx, var_export( $opts, true ))
+            );
         }
     }
 
@@ -127,20 +127,25 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * Assert padding
      *
      * @param int $padding
-     * @param int|string $argIx
-     * @param int $defaultIfNull
-     * @return int
+     * @param null|int|string $argIx
+     * @param null|int $defaultIfNull
+     * @return null|int
      * @throws InvalidArgumentException
-     * @access private
-     * @static
      */
-    private static function assertPadding( $padding = null, $argIx = 1, $defaultIfNull = null ) {
+    private static function assertPadding(
+        $padding = null,
+        $argIx = 1,
+        $defaultIfNull = null
+    ) : int
+    {
         static $FMTPADDERR = 'Invalid padding arg (#%d), %s';
-        if( is_null( $padding )) {
+        if( null === $padding ) {
             $padding = $defaultIfNull;
         }
         if( ! in_array( $padding, self::$OPENSSLPADDINGS4 )) {
-            throw new InvalidArgumentException( sprintf( $FMTPADDERR, $argIx, var_export( $padding, true  )));
+            throw new InvalidArgumentException(
+                sprintf( $FMTPADDERR, $argIx, var_export( $padding, true  ))
+            );
         }
         return $padding;
     }
@@ -153,9 +158,9 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @return int
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getCipherIvLength( $cipherAlgorithm ) {
+    public static function getCipherIvLength( string $cipherAlgorithm ) : int
+    {
         $FMTERR2 = ', cipherAlgorithm: %s, ';
         self::assertCipherAlgorithm( $cipherAlgorithm );
         $initializationVectorNumBytes = false;
@@ -174,7 +179,11 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         }
         if( false === $initializationVectorNumBytes ) {
             $msg2 = sprintf( $FMTERR2, $cipherAlgorithm );
-            self::logAndThrowRuntimeException( __FUNCTION__, $msg2, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                $msg2,
+                self::getOpenSSLErrors()
+            );
         }
         return $initializationVectorNumBytes;
     }
@@ -183,40 +192,72 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * Return openssl_decrypted data - uses openssl_decrypt
      *
      * Takes a raw or base64 encoded string and decrypts it using a given method and key.
+     *
      * @link https://www.php.net/manual/en/function.openssl-decrypt.php
-     * @param string $raw                    The encrypted message to be decrypted
-     * @param string $cipherAlgorithm        cipher method, one of openssl_get_cipher_methods()
-     * @param string $keyHash                The key
-     * @param int    $opts                   one of OPENSSL_RAW_DATA, OPENSSL_ZERO_PADDING
-     * @param string $initializationVector   A non-NULL Initialization Vector
+     * @param string $raw               The encrypted message to be decrypted
+     * @param string $cipherAlgorithm   cipher method, one of openssl_get_cipher_methods()
+     * @param string $keyHash           The key
+     * @param null|int    $opts         one of OPENSSL_RAW_DATA, OPENSSL_ZERO_PADDING
+     * @param null|string $initializationVector
+     *                                  A non-NULL Initialization Vector
      * @return string
      * @throws InvalidArgumentException
      * @throws RunTimeException
-     * @static
      */
-    public static function decrypt( $raw, $cipherAlgorithm, $keyHash, $opts = 0, $initializationVector = '' ) {
+    public static function decrypt(
+        string $raw,
+        string $cipherAlgorithm,
+        string $keyHash,
+        $opts = 0,
+        $initializationVector = ''
+    ) : string
+    {
         static $FMTERR2 = 'cipherAlgorithm: %s, keyHash length: %d, (iv length: %d) ';
-        Assert::string( $raw, 1 );
         self::assertCipherAlgorithm( $cipherAlgorithm );
-        Assert::string( $keyHash, 3 );
         self::assertOpts( $opts, 4 );
         $decrypted = false;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $decrypted = openssl_decrypt( $raw, $cipherAlgorithm, $keyHash, $opts, $initializationVector );
+            $decrypted = openssl_decrypt(
+                $raw,
+                $cipherAlgorithm,
+                $keyHash,
+                $opts,
+                $initializationVector
+            );
         }
         catch( Exception $e ) {
             $cond = ( false !== $decrypted );
-            $msg2 = sprintf( $FMTERR2, $cipherAlgorithm, strlen( $keyHash ), strlen( $initializationVector ));
-            self::assessCatch( __FUNCTION__, $e, $cond, self::getOpenSSLErrors(), $msg2 );
+            $msg2 = sprintf(
+                $FMTERR2,
+                $cipherAlgorithm,
+                strlen( $keyHash ),
+                strlen( $initializationVector )
+            );
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                $cond,
+                self::getOpenSSLErrors(),
+                $msg2
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $decrypted ) {
-            $msg2 = sprintf( $FMTERR2, $cipherAlgorithm, strlen( $keyHash ), strlen( $initializationVector ));
-            self::logAndThrowRuntimeException( __FUNCTION__, $msg2, self::getOpenSSLErrors());
+            $msg2 = sprintf(
+                $FMTERR2,
+                $cipherAlgorithm,
+                strlen( $keyHash ),
+                strlen( $initializationVector )
+            );
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                $msg2,
+                self::getOpenSSLErrors()
+            );
         }
         return $decrypted;
     }
@@ -227,15 +268,27 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param string $raw                    The encrypted message to be decrypted
      * @param string $cipherAlgorithm        cipher method, one of openssl_get_cipher_methods()
      * @param string $keyHash                The key
-     * @param int    $opts                   one of OPENSSL_RAW_DATA, OPENSSL_ZERO_PADDING
-     * @param string $initializationVector   A non-NULL Initialization Vector
+     * @param null|int    $opts              one of OPENSSL_RAW_DATA, OPENSSL_ZERO_PADDING
+     * @param null|string $initializationVector   A non-NULL Initialization Vector
      * @return string
      * @throws InvalidArgumentException
      * @throws RunTimeException
-     * @static
      */
-    public static function getDecryptedString( $raw, $cipherAlgorithm, $keyHash, $opts = 0, $initializationVector = '' ) {
-        return self::decrypt( $raw, $cipherAlgorithm, $keyHash, $opts, $initializationVector );
+    public static function getDecryptedString(
+        string $raw,
+        string $cipherAlgorithm,
+        string $keyHash,
+        $opts = 0,
+        $initializationVector = ''
+    ) : string
+    {
+        return self::decrypt(
+            $raw,
+            $cipherAlgorithm,
+            $keyHash,
+            $opts,
+            $initializationVector
+        );
     }
 
     /**
@@ -245,33 +298,45 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param string $key             The data
      * @param string $hashAlgorithm   digest method to use
      *                                one of openssl_get_md_methods(), self::getAvailableDigestMethods()
-     * @param bool   $rawOutput       Setting to TRUE will return as raw output data, otherwise binhex encoded
+     * @param null|bool   $rawOutput  Setting to TRUE will return as raw output data, otherwise binhex encoded
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function digest( $key, $hashAlgorithm, $rawOutput = false ) {
+    public static function digest(
+        string $key,
+        string $hashAlgorithm,
+        $rawOutput = false
+    ) : string
+    {
         static $FMTERR2 = ', hashAlgorithm: %s ';
-        Assert::string( $key );
         self::assertMdAlgorithm( $hashAlgorithm );
-        $rawOutput = Assert::bool( $rawOutput, 3, false );
         $keyHash = false;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $keyHash = openssl_digest( $key, $hashAlgorithm, $rawOutput );
+            $keyHash = openssl_digest( $key, $hashAlgorithm, ( $rawOutput ?? false ));
         }
         catch( Exception $e ) {
             $msg2 = sprintf( $FMTERR2, $hashAlgorithm );
-            self::assessCatch( __FUNCTION__, $e, ( false !== $keyHash ), self::getOpenSSLErrors(), $msg2 );
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $keyHash ),
+                self::getOpenSSLErrors(),
+                $msg2
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $keyHash ) {
             $msg2 = sprintf( $FMTERR2, $hashAlgorithm );
-            self::logAndThrowRuntimeException( __FUNCTION__, $msg2, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                $msg2,
+                self::getOpenSSLErrors()
+            );
         }
         return $keyHash;
     }
@@ -282,13 +347,17 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param string $key             The data
      * @param string $hashAlgorithm   digest method to use
      *                                one of openssl_get_md_methods(), self::getAvailableDigestMethods()
-     * @param bool   $rawOutput       Setting to TRUE will return as raw output data, otherwise binhex encoded
+     * @param null|bool   $rawOutput  Setting to TRUE will return as raw output data, otherwise binhex encoded
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getDigestHash( $key, $hashAlgorithm, $rawOutput = false ) {
+    public static function getDigestHash(
+        string $key,
+        string $hashAlgorithm,
+        $rawOutput = false
+    ) : string
+    {
         return self::digest( $key, $hashAlgorithm, $rawOutput );
     }
 
@@ -296,38 +365,66 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * Return encrypted data - uses openssl_encrypt
      *
      * Encrypts given data with given method and key, returns a raw or base64 encoded string
+     *
      * @link https://www.php.net/manual/en/function.openssl-encrypt.php
-     * @param string $data                  The plaintext message data to be encrypted
-     * @param string $cipherAlgorithm       cipher method, one of openssl_get_cipher_methods()
-     * @param string $keyHash               The key
-     * @param int    $opts                  bitwise disjunction of the flags OPENSSL_RAW_DATA and OPENSSL_ZERO_PADDING
-     * @param string $initializationVector  A non-NULL Initialization Vector
+     * @param string $data               The plaintext message data to be encrypted
+     * @param string $cipherAlgorithm    cipher method, one of openssl_get_cipher_methods()
+     * @param string $keyHash            The key
+     * @param null|int    $opts          bitwise disjunction of the flags OPENSSL_RAW_DATA and OPENSSL_ZERO_PADDING
+     * @param null|string $initializationVector
+     *                                   A non-NULL Initialization Vector
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function encrypt( $data, $cipherAlgorithm, $keyHash, $opts = 0, $initializationVector = '' ) {
+    public static function encrypt(
+        string $data,
+        string $cipherAlgorithm,
+        string $keyHash,
+        $opts = 0,
+        $initializationVector = ''
+    ) : string
+    {
         static $FMTERR2 = 'cipherAlgorithm: %s, keyHash length: %d (iv length: %d) ';
-        Assert::string( $data, 1 );
         self::assertCipherAlgorithm( $cipherAlgorithm );
-        Assert::string( $keyHash, 3 );
         self::assertOpts( $opts, 4 );
         $encrypted = false;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $encrypted = openssl_encrypt( $data, $cipherAlgorithm, $keyHash, $opts, $initializationVector );
+            $encrypted = openssl_encrypt(
+                $data,
+                $cipherAlgorithm,
+                $keyHash,
+                $opts,
+                $initializationVector
+            );
         }
         catch( Exception $e ) {
-            $msg2 = sprintf( $FMTERR2, $cipherAlgorithm, strlen( $keyHash ), strlen( $initializationVector ));
-            self::assessCatch( __FUNCTION__, $e, ( false !== $keyHash ), self::getOpenSSLErrors(), $msg2 );
+            $msg2 = sprintf(
+                $FMTERR2,
+                $cipherAlgorithm,
+                strlen( $keyHash ),
+                strlen( $initializationVector ?? '' )
+            );
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                true,
+                self::getOpenSSLErrors(),
+                $msg2
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $encrypted ) {
-            $msg2 = sprintf( $FMTERR2, $cipherAlgorithm, strlen( $keyHash ), strlen( $initializationVector ));
+            $msg2 = sprintf(
+                $FMTERR2,
+                $cipherAlgorithm,
+                strlen( $keyHash ),
+                strlen( $initializationVector ?? '')
+            );
             self::logAndThrowRuntimeException( __FUNCTION__, $msg2, self::getOpenSSLErrors());
         }
         return $encrypted;
@@ -336,18 +433,31 @@ class OpenSSLFactory extends OpenSSLBaseFactory
     /**
      * Return encrypted data - alias of 'encrypt'
      *
-     * @param string $data                  The plaintext message data to be encrypted
-     * @param string $cipherAlgorithm       cipher method, one of openssl_get_cipher_methods()
-     * @param string $keyHash               The key
-     * @param int    $opts                  bitwise disjunction of the flags OPENSSL_RAW_DATA and OPENSSL_ZERO_PADDING
-     * @param string $initializationVector  A non-NULL Initialization Vector
+     * @param string $data              The plaintext message data to be encrypted
+     * @param string $cipherAlgorithm   cipher method, one of openssl_get_cipher_methods()
+     * @param string $keyHash           The key
+     * @param null|int    $opts         bitwise disjunction of the flags OPENSSL_RAW_DATA and OPENSSL_ZERO_PADDING
+     * @param null|string $initializationVector
+     *                                  A non-NULL Initialization Vector
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getEncryptedString( $data, $cipherAlgorithm, $keyHash, $opts = 0, $initializationVector = '' ) {
-        return self::encrypt( $data, $cipherAlgorithm, $keyHash, $opts, $initializationVector );
+    public static function getEncryptedString(
+        string $data,
+        string $cipherAlgorithm,
+        string $keyHash,
+        $opts = 0,
+        $initializationVector = ''
+    ) : string
+    {
+        return self::encrypt(
+            $data,
+            $cipherAlgorithm,
+            $keyHash,
+            $opts,
+            $initializationVector
+        );
     }
 
     /**
@@ -363,15 +473,18 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                         The named file must contain a (single) PEM encoded key
      *                                      3. A string, PEM formatted key.
      *                                      4 array(2/3, passPhrase)
-     * @param int              $padding     One of OPENSSL_PKCS1_PADDING (default),
+     * @param null|int         $padding     One of OPENSSL_PKCS1_PADDING (default),
      *                                      OPENSSL_SSLV23_PADDING, OPENSSL_PKCS1_OAEP_PADDING, OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function privateDecrypt( $data, $privateKey, $padding = null ) {
-        Assert::string( $data, 1 );
+    public static function privateDecrypt(
+        string $data,
+        $privateKey,
+        $padding = null
+    ) : string
+    {
         $privateKey = OpenSSLPkeyFactory::assertPkey( $privateKey, 2, true );
         $padding    = self::assertPadding( $padding, 3, OPENSSL_PKCS1_PADDING );
         $result     = false;
@@ -379,16 +492,30 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_private_decrypt( $data, $decrypted, $privateKey, $padding );
+            $result = openssl_private_decrypt(
+                $data,
+                $decrypted,
+                $privateKey,
+                $padding
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         return $decrypted;
     }
@@ -403,14 +530,18 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                         The named file must contain a (single) PEM encoded key
      *                                      3. A string, PEM formatted key.
      *                                      4 array(2/3, passPhrase)
-     * @param int              $padding     One of OPENSSL_PKCS1_PADDING (default),
+     * @param null|int         $padding     One of OPENSSL_PKCS1_PADDING (default),
      *                                      OPENSSL_SSLV23_PADDING, OPENSSL_PKCS1_OAEP_PADDING, OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getprivateKeyDecryptedString( $data, $privateKey, $padding = null ) {
+    public static function getprivateKeyDecryptedString(
+        string $data,
+        $privateKey,
+        $padding = null
+    ) : string
+    {
         return self::privateDecrypt( $data, $privateKey, $padding );
     }
 
@@ -427,14 +558,17 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                         The named file must contain a (single) PEM encoded key
      *                                      3. A string, PEM formatted key.
      *                                      4 array(2/3, passPhrase)
-     * @param int              $padding     One of OPENSSL_PKCS1_PADDING (default), OPENSSL_NO_PADDING
+     * @param null|int         $padding     One of OPENSSL_PKCS1_PADDING (default), OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function privateEncrypt( $data, $privateKey, $padding = null ) {
-        Assert::string( $data, 1 );
+    public static function privateEncrypt(
+        string $data,
+        $privateKey,
+        $padding = null
+    ) : string
+    {
         $privateKey = OpenSSLPkeyFactory::assertPkey( $privateKey, 2, true );
         $padding    = self::assertPadding( $padding, 3, OPENSSL_PKCS1_PADDING );
         $result     = false;
@@ -442,16 +576,30 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_private_encrypt( $data, $encrypted, $privateKey, $padding );
+            $result = openssl_private_encrypt(
+                $data,
+                $encrypted,
+                $privateKey,
+                $padding
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         return $encrypted;
     }
@@ -466,13 +614,17 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                         The named file must contain a (single) PEM encoded key
      *                                      3. A string, PEM formatted key.
      *                                      4 array(2/3, passPhrase)
-     * @param int              $padding     One of OPENSSL_PKCS1_PADDING (default), OPENSSL_NO_PADDING
+     * @param null|int         $padding     One of OPENSSL_PKCS1_PADDING (default), OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getprivateKeyEncryptedString( $data, $privateKey, $padding = null ) {
+    public static function getprivateKeyEncryptedString(
+        string $data,
+        $privateKey,
+        $padding = null
+    ) : string
+    {
         return self::privateEncrypt( @$data, $privateKey, $padding );
     }
 
@@ -487,15 +639,18 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                    2. A string having the format (file://)/path/to/file.pem.
      *                                       The named file must contain a (single) PEM encoded key
      *                                    3. A string, PEM formatted key.
-     * @param int             $padding    One of OPENSSL_PKCS1_PADDING (default),
+     * @param null|int        $padding    One of OPENSSL_PKCS1_PADDING (default),
      *                                    OPENSSL_SSLV23_PADDING, OPENSSL_PKCS1_OAEP_PADDING, OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function publicDecrypt( $data, $publicKey, $padding = null ) {
-        Assert::string( $data, 1 );
+    public static function publicDecrypt(
+        string $data,
+        $publicKey,
+        $padding = null
+    ) : string
+    {
         $publicKey = OpenSSLPkeyFactory::assertPkey( $publicKey, 2, true );
         $padding   = self::assertPadding( $padding, 3, OPENSSL_PKCS1_PADDING );
         $result    = false;
@@ -503,16 +658,30 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_public_decrypt( $data, $decrypted, $publicKey, $padding );
+            $result = openssl_public_decrypt(
+                $data,
+                $decrypted,
+                $publicKey,
+                $padding
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         return $decrypted;
     }
@@ -526,14 +695,18 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                    2. A string having the format (file://)/path/to/file.pem.
      *                                       The named file must contain a (single) PEM encoded key
      *                                    3. A string, PEM formatted key.
-     * @param int             $padding    One of OPENSSL_PKCS1_PADDING (default),
+     * @param null|int        $padding    One of OPENSSL_PKCS1_PADDING (default),
      *                                    OPENSSL_SSLV23_PADDING, OPENSSL_PKCS1_OAEP_PADDING, OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getpublicKeyDecryptedString( $data, $publicKey, $padding = null ) {
+    public static function getpublicKeyDecryptedString(
+        string $data,
+        $publicKey,
+        $padding = null
+    ) : string
+    {
         return self::publicDecrypt( $data, $publicKey, $padding );
     }
 
@@ -548,15 +721,18 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                    2. A string having the format (file://)/path/to/file.pem.
      *                                       The named file must contain a (single) PEM encoded key
      *                                    3. A string, PEM formatted key.
-     * @param int             $padding    One of OPENSSL_PKCS1_PADDING (default),
+     * @param null|int        $padding    One of OPENSSL_PKCS1_PADDING (default),
      *                                    OPENSSL_SSLV23_PADDING, OPENSSL_PKCS1_OAEP_PADDING, OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function publicEncrypt( $data, $publicKey, $padding = null ) {
-        Assert::string( $data, 1 );
+    public static function publicEncrypt(
+        string $data,
+        $publicKey,
+        $padding = null
+    ) : string
+    {
         $publicKey = OpenSSLPkeyFactory::assertPkey( $publicKey, 2, true );
         $padding   = self::assertPadding( $padding, 3, OPENSSL_PKCS1_PADDING );
         $result    = false;
@@ -564,16 +740,30 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_public_encrypt( $data, $encrypted, $publicKey, $padding );
+            $result = openssl_public_encrypt(
+                $data,
+                $encrypted,
+                $publicKey,
+                $padding
+            );
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         return $encrypted;
     }
@@ -587,14 +777,18 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                    2. A string having the format (file://)/path/to/file.pem.
      *                                       The named file must contain a (single) PEM encoded key
      *                                    3. A string, PEM formatted key.
-     * @param int             $padding    One of OPENSSL_PKCS1_PADDING (default),
+     * @param null|int        $padding    One of OPENSSL_PKCS1_PADDING (default),
      *                                    OPENSSL_SSLV23_PADDING, OPENSSL_PKCS1_OAEP_PADDING, OPENSSL_NO_PADDING
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getpublicKeyEncryptedString( $data, $publicKey, $padding = null ) {
+    public static function getpublicKeyEncryptedString(
+        string $data,
+        $publicKey,
+        $padding = null
+    ) : string
+    {
         return self::publicEncrypt( $data, $publicKey, $padding );
     }
 
@@ -614,18 +808,20 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                          The named file must contain a (single) PEM encoded key
      *                                       3. A string, PEM formatted key.
      *                                       4. array (2/3, passPhrase)
-     * @param string          $cipherAlgorithm       The cipher method, default 'RC4'
-     * @param string          $initializationVector  A non-NULL Initialization Vector, PHP >= 7.0.0
+     * @param null|string     $cipherAlgorithm       The cipher method, default 'RC4'
+     * @param null|string     $initializationVector  A non-NULL Initialization Vector, PHP >= 7.0.0
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
     public static function open(
-        $data, $envelopeKey, $privateKeyId, $cipherAlgorithm = null, $initializationVector = null
-    ) {
-        Assert::string( $data, 1 );
-        Assert::string( $envelopeKey, 2 );
+        string $data,
+        string $envelopeKey,
+        $privateKeyId,
+        $cipherAlgorithm = null,
+        $initializationVector = null
+    ) : string
+    {
         $privateKeyId = OpenSSLPkeyFactory::assertPkey( $privateKeyId, 3, true );
         if( empty( $cipherAlgorithm )) {
             $cipherAlgorithm = 'RC4';
@@ -638,26 +834,51 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         try {
             switch( true ) {
                 case empty( $method ) :
-                    $result = openssl_open( $data, $decrypted, $envelopeKey, $privateKeyId );
+                    $result = openssl_open(
+                        $data,
+                        $decrypted,
+                        $envelopeKey,
+                        $privateKeyId
+                    );
                     break;
                 case empty( $initializationVector ) :
-                    $result = openssl_open( $data, $decrypted, $envelopeKey, $privateKeyId, $cipherAlgorithm );
+                    $result = openssl_open(
+                        $data,
+                        $decrypted,
+                        $envelopeKey,
+                        $privateKeyId,
+                        $cipherAlgorithm
+                    );
                     break;
                 default :
                     $result = openssl_open(
-                        $data, $decrypted, $envelopeKey, $privateKeyId, $cipherAlgorithm, $initializationVector
+                        $data,
+                        $decrypted,
+                        $envelopeKey,
+                        $privateKeyId,
+                        $cipherAlgorithm,
+                        $initializationVector
                     );
                     break;
             }
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         return $decrypted;
     }
@@ -673,17 +894,27 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                          The named file must contain a (single) PEM encoded key
      *                                       3. A string, PEM formatted key.
      *                                       4. array (2/3, passPhrase)
-     * @param string          $cipherAlgorithm       The cipher method, default 'RC4'
-     * @param string          $initializationVector  A non-NULL Initialization Vector, PHP >= 7.0.0
+     * @param null|string     $cipherAlgorithm       The cipher method, default 'RC4'
+     * @param null|string     $initializationVector  A non-NULL Initialization Vector, PHP >= 7.0.0
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
     public static function getOpenedSealedString(
-        $data, $envelopeKey, $privateKeyId, $cipherAlgorithm = null, $initializationVector = null
-    ) {
-        return self::open( $data, $envelopeKey, $privateKeyId, $cipherAlgorithm, $initializationVector );
+        string $data,
+        string $envelopeKey,
+        $privateKeyId,
+        $cipherAlgorithm = null,
+        $initializationVector = null
+    ) : string
+    {
+        return self::open(
+            $data,
+            $envelopeKey,
+            $privateKeyId,
+            $cipherAlgorithm,
+            $initializationVector
+        );
     }
 
     /**
@@ -708,10 +939,14 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param null                  $iv
      * @return array  [ sealedData, envelopeKeys ]
      *                                               The array envelopeKeys will have the same keys as publicKeyIds
-     * @static
      */
-    public static function seal( $data, $publicKeyIds, $cipherAlgorithm = null, & $iv = null ) {
-        Assert::string( $data, 1 );
+    public static function seal(
+        string $data,
+        $publicKeyIds,
+        $cipherAlgorithm = null,
+        & $iv = null
+    ) : array
+    {
         $publicKeysArr = [];
         foreach( (array) $publicKeyIds as $x => $publicKey ) {
             $publicKeysArr[$x] = OpenSSLPkeyFactory::assertPkey( $publicKey, 2, true );
@@ -728,28 +963,49 @@ class OpenSSLFactory extends OpenSSLBaseFactory
             switch( true ) {
                 case empty( $iv ) :
                     $result = openssl_seal(
-                        $data, $sealedData, $envelopeKeys, $publicKeysArr, $cipherAlgorithm
+                        $data,
+                        $sealedData,
+                        $envelopeKeys,
+                        $publicKeysArr,
+                        $cipherAlgorithm
                     );
                     break;
                 default :
                     $result = openssl_seal(
-                        $data, $sealedData, $envelopeKeys, $publicKeysArr, $cipherAlgorithm, $iv
+                        $data,
+                        $sealedData,
+                        $envelopeKeys,
+                        $publicKeysArr,
+                        $cipherAlgorithm,
+                        $iv
                     );
                     break;
             } // end switch
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $envelopeKeys2 = array_combine( array_keys( $publicKeysArr ), $envelopeKeys );
+            $envelopeKeys2 = array_combine(
+                array_keys( $publicKeysArr ),
+                $envelopeKeys
+            );
         }
         catch( Exception $e ) {
             $envelopeKeys2 = $envelopeKeys;
@@ -770,15 +1026,21 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      *                                   2. A string having the format (file://)/path/to/file.pem.
      *                                      The named file must contain a (single) PEM encoded key
      *                                   3. A string, PEM formatted key.
-     * @param string $cipherAlgorithm       The cipher method, default 'RC4'
+     * @param null|string $cipherAlgorithm
+     *                                 The cipher method, default 'RC4'
      * @param string $iv               A non-NULL Initialization Vector, PHP >= 7.0.0
      * @return array  [ sealedData, envelopeKeys ]
      *                                 The array envelopeKeys will have the same keys as publicKeyIds
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getSealedString( $data, $publicKeyIds, $cipherAlgorithm = null, & $iv = null ) {
+    public static function getSealedString(
+        string $data,
+        $publicKeyIds,
+        $cipherAlgorithm = null,
+        & $iv = null
+    ) : array
+    {
         return self::seal( $data, $publicKeyIds, $cipherAlgorithm, $iv );
     }
 
@@ -792,17 +1054,20 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param resource|string $privateKey     1. a key, returned by openssl_get_privatekey()
      *                                        2. a PEM formatted key
      *                                        3. file with PEM formatted key content
-     * @param int|string      $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
+     * @param null|int|string $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
      *                                        2. one of openssl_get_md_methods(), self::getAvailableDigestMethods()
      *                                        default OPENSSL_ALGO_SHA1
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function sign( $data, $privateKey, $signatureAlgo = OPENSSL_ALGO_SHA1 ) {
+    public static function sign(
+        string $data,
+        $privateKey,
+        $signatureAlgo = OPENSSL_ALGO_SHA1
+    ) : string
+    {
         static $FMTERR2 = 'algorithm: %s ';
-        Assert::string( $data, 1 );
         $privateKey = OpenSSLPkeyFactory::assertPkey( $privateKey, 2, true );
         if( ! in_array( $signatureAlgo, self::$SIGNATUREALGOS )) {
             self::assertMdAlgorithm( $signatureAlgo );
@@ -816,14 +1081,24 @@ class OpenSSLFactory extends OpenSSLBaseFactory
         }
         catch( Exception $e ) {
             $msg2 = sprintf( $FMTERR2, $signatureAlgo );
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors(),$msg2 );
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors(),
+                $msg2
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
             $msg2 = sprintf( $FMTERR2, $signatureAlgo );
-            self::logAndThrowRuntimeException( __FUNCTION__, $msg2, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                $msg2,
+                self::getOpenSSLErrors()
+            );
         }
         return $signature;
     }
@@ -835,15 +1110,19 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param resource|string $privateKey     1. a key, returned by openssl_get_privatekey()
      *                                        2. a PEM formatted key
      *                                        3. file with PEM formatted key content
-     * @param int|string      $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
+     * @param null|int|string $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
      *                                        2. one of openssl_get_md_methods(), self::getAvailableDigestMethods()
      *                                        default OPENSSL_ALGO_SHA1
      * @return string
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function getSignature( $data, $privateKey, $signatureAlgo = OPENSSL_ALGO_SHA1 ) {
+    public static function getSignature(
+        string $data,
+        $privateKey,
+        $signatureAlgo = OPENSSL_ALGO_SHA1
+    ) : string
+    {
         return self::sign( $data, $privateKey, $signatureAlgo );
     }
 
@@ -858,17 +1137,20 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param resource|string $publicKeyId    1. a key (resource), returned by  openssl_get_publickey()
      *                                        2. a PEM formatted key
      *                                        3. file with PEM formatted key
-     * @param int|string      $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
+     * @param null|int|string $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
      *                                        2. one of openssl_get_md_methods(), self::getAvailableDigestMethods()
      *                                        default OPENSSL_ALGO_SHA1
      * @return bool
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function verify( $data, $signature, $publicKeyId, $signatureAlgo = OPENSSL_ALGO_SHA1 ) {
-        Assert::string( $data, 1 );
-        Assert::string( $signature, 2 );
+    public static function verify(
+        string $data,
+        string $signature,
+        $publicKeyId,
+        $signatureAlgo = OPENSSL_ALGO_SHA1
+    ) : bool
+    {
         $publicKeyId = OpenSSLPkeyFactory::assertPkey( $publicKeyId, 3, true );
         if( ! in_array( $signatureAlgo, self::$SIGNATUREALGOS )) {
             self::assertMdAlgorithm( $signatureAlgo );
@@ -880,13 +1162,22 @@ class OpenSSLFactory extends OpenSSLBaseFactory
             $result = openssl_verify( $data, $signature, $publicKeyId, $signatureAlgo );
         }
         catch( Exception $e ) {
-            self::assessCatch( __FUNCTION__, $e, ( -1 != $result ), self::getOpenSSLErrors());
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( -1 != $result ),
+                self::getOpenSSLErrors()
+            );
         }
         finally {
             restore_error_handler();
         }
         if( -1 == $result ) {
-            self::logAndThrowRuntimeException( __FUNCTION__, null, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                null,
+                self::getOpenSSLErrors()
+            );
         }
         return (bool) $result;
     }
@@ -899,15 +1190,20 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * @param resource|string $publicKeyId    1. a key (resource), returned by  openssl_get_publickey()
      *                                        2. a PEM formatted key
      *                                        3. file with PEM formatted key
-     * @param int|string      $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
+     * @param null|int|string $signatureAlgo  1. one of https://www.php.net/manual/en/openssl.signature-algos.php
      *                                        2. one of openssl_get_md_methods(), self::getAvailableDigestMethods()
      *                                        default OPENSSL_ALGO_SHA1
      * @return bool
      * @throws InvalidArgumentException
      * @throws RuntimeException
-     * @static
      */
-    public static function isSignatureOkForPublicKey( $data, $signature, $publicKeyId, $signatureAlgo = OPENSSL_ALGO_SHA1 ) {
+    public static function isSignatureOkForPublicKey(
+        string $data,
+        string $signature,
+        $publicKeyId,
+        $signatureAlgo = OPENSSL_ALGO_SHA1
+    ) : bool
+    {
         return self::verify( $data, $signature, $publicKeyId, $signatureAlgo );
     }
 
@@ -917,47 +1213,64 @@ class OpenSSLFactory extends OpenSSLBaseFactory
      * Computes PBKDF2 (Password-Based Key Derivation Function 2), a key derivation function defined in PKCS5 v2.
      * @link https://www.php.net/manual/en/function.openssl-pbkdf2.php
      * @param string $passWord    Password from which the derived key is generated.
-     * @param string $salt        PBKDF2 recommends a crytographic salt of at least 64 bits (8 bytes).
+     * @param null|string $salt        PBKDF2 recommends a crytographic salt of at least 64 bits (8 bytes).
      *                            default 64 random bytes
-     * @param int    $keyLength   Length of desired output key, default 40
-     * @param int    $iterations  The number of iterations desired. NIST recommends at least 10,000.
+     * @param null|int    $keyLength   Length of desired output key, default 40
+     * @param null|int    $iterations  The number of iterations desired. NIST recommends at least 10,000.
      *                            https://pages.nist.gov/800-63-3/sp800-63b.html#sec5
-     * @param string $algorithm   Optional hash or digest algorithm from openssl_get_md_methods(). Defaults to SHA-1.
+     * @param null|string $algorithm   Optional hash or digest algorithm from openssl_get_md_methods(). Defaults to SHA-1.
      * @return string
      * @throws InvalidArgumentException
-     * @static
      */
-    public static function getPbkdf2( $passWord, $salt = null, $keyLength = 40, $iterations = 10000, $algorithm = 'SHA1' ) {
+    public static function getPbkdf2(
+        string $passWord,
+        $salt = null,
+        $keyLength = 40,
+        $iterations = 10000,
+        $algorithm = 'SHA1'
+    ) : string
+    {
         static $FMTERR2 = 'algorithm: %s ';
-        Assert::string( $passWord );
         if( empty( $salt )) {
             $salt   = Workshop::getSalt( 64 );
         }
         $length     = Assert::int( $keyLength, 3, 40 );
         $iterations = Assert::int( $iterations, 4, 10000 );
-        if( empty( $algorithm )) {
-            $algorithm = 'SHA1';
-        }
-        self::assertMdAlgorithm( $algorithm );
+        $algorithm  = self::assertMdAlgorithm( $algorithm ?? 'SHA1' );
         $result     = false;
         $signature  = null;
         self::clearOpenSSLErrors();
         set_error_handler( self::$ERRORHANDLER );
         try {
-            $result = openssl_pbkdf2( $passWord, $salt, $length, $iterations, $algorithm );
+            $result = openssl_pbkdf2(
+                $passWord,
+                $salt,
+                $length,
+                $iterations,
+                $algorithm
+            );
         }
         catch( Exception $e ) {
             $msg2 = sprintf( $FMTERR2, $algorithm );
-            self::assessCatch( __FUNCTION__, $e, ( false !== $result ), self::getOpenSSLErrors(), $msg2 );
+            self::assessCatch(
+                __FUNCTION__,
+                $e,
+                ( false !== $result ),
+                self::getOpenSSLErrors(),
+                $msg2
+            );
         }
         finally {
             restore_error_handler();
         }
         if( false === $result ) {
             $msg2 = sprintf( $FMTERR2, $algorithm );
-            self::logAndThrowRuntimeException( __FUNCTION__, $msg2, self::getOpenSSLErrors());
+            self::logAndThrowRuntimeException(
+                __FUNCTION__,
+                $msg2,
+                self::getOpenSSLErrors()
+            );
         }
         return $result;
     }
-
 }
