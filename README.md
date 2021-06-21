@@ -239,3 +239,5 @@ This project is licensed under the LGPLv3 License
 
 [Composer]:https://getcomposer.org/
 [Github]:https://github.com/iCalcreator/OpenSSLToolbox/issues
+[PHPCompatibility]:https://github.com/PHPCompatibility/PHPCompatibility
+[PHPStan]:https://github.com/phpstan/phpstan
